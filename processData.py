@@ -15,7 +15,7 @@ def extractSentiments(speech : str) -> float:
     return sentiment
 
 def extractTopic(speech:str,threshold)->list:
-    classifier = pipeline("zero-shot-classification", model="joeddav/xlm-roberta-large-xnli")
+    classifier = pipeline("zero-shot-classification", model="")
     if not isinstance(speech, str) or speech.strip() == "":
         return []
     result = classifier(speech, candidate_labels=labels, multi_label=True)
