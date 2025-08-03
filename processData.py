@@ -15,9 +15,4 @@ def extractSentiments(speech : str) -> float:
     return sentiment
 
 def extractTopic(speech:str,threshold)->list:
-    classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
-    if not isinstance(speech, str) or speech.strip() == "":
-        return []
-    result = classifier(speech, candidate_labels=labels, multi_label=True)
-    tagged = [label for label, score in zip(result["labels"], result["scores"]) if score > threshold]
-    return tagged
+    pass
