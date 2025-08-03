@@ -1,6 +1,11 @@
 import pandas as pd
 
-def clean_data(path:str):
+def clean_presidential_speeches(path:str):
+    """
+    Cleaning the presidential_speech.csv file.
+    :param path: path of the file
+    :return: cleaned file
+    """
     presidential_speeches = pd.read_excel(path)
     #remove vice president column
     presidential_speeches = presidential_speeches.drop('Vice President', axis=1)
@@ -9,3 +14,4 @@ def clean_data(path:str):
     #make speech and info lower case
     presidential_speeches['speech'] = presidential_speeches['speech'].str.lower()
     presidential_speeches['info'] = presidential_speeches['info'].str.lower()
+    return presidential_speeches
