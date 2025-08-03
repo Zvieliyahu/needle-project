@@ -11,19 +11,19 @@ topics = {
     "Healthcare": [
         "healthcare", "insurance", "patients", "patient", "hospitals", "hospital", "medicare", "medicaid", "affordable",
         "doctors", "doctor", "nurses", "nurse", "medical", "coverage", "public health", "epidemic", "pandemic",
-        "treatments" ,"treatment"
+        "treatments","treatment"
     ],
     "Education": [
         "education", "school", "schools", "students", "student", "teachers", "teacher", "learn", "learns",
         "learning", "curriculum", "college", "colleges", "universities", "scholarships" 
-        "university", "scholarship", "literacy", "higher education", "classroom"
+        "university", "scholarship", "literacy", "classroom"
     ],
     "Environment": [
-        "environment", "climate", "pollution", "carbon", "emissions", "global warming", "green",
+        "environment", "climate", "pollution", "carbon", "emissions", "warming", "green",
         "sustainability", "renewable", "energy", "solar", "wind", "clean air", "clean water"
     ],
     "Defense": [
-        "military", "defense", "armed forces", "force", "troops", "troop", "security", "war", "weapon", "weapons", "army",
+        "military", "defense", "forces", "force", "troops", "troop", "security", "war", "weapon", "weapons", "army",
         "navy", "air force", "nuclear", "terrorism", "strategy", "homeland", "counterterrorism"
     ],
     "Foreign Policy": [
@@ -31,67 +31,67 @@ topics = {
         "sanctions", "war", "conflict", "aid", "peacekeeping", "global", "coalition"
     ],
     "Immigration": [
-        "immigration", "migrant","migrants", "border", "borders", "asylum", "visa", "refugee", "refugees",
+        "immigration", "migrant", "migrants", "border", "borders", "asylum", "visa", "refugee", "refugees",
         "citizenship", "deportation", "illegal", "undocumented", "green card", "immigrants","immigrant", "amnesty"
     ],
     "Civil Rights": [
-        "civil rights", "equality", "justice", "discrimination", "racism", "segregation", "freedom",
+        "civil", "rights", "equality", "justice", "discrimination", "racism", "segregation", "freedom",
         "injustice", "prejudice", "black", "minorities", "voting rights", "LGBTQ", "gender", "genders"
     ],
     "Technology": [
-        "technology", "innovation", "researches","research", "science", "AI", "artificial intelligence",
+        "technology", "innovation", "researches","research", "science", "AI", "artificial",
         "cybersecurity", "internet", "data", "automation", "engineering", "robotics"
     ],
     "Energy": [
-        "energy", "oil", "gas", "renewable", "power", "electricity", "fossil fuels", "solar",
+        "energy", "oil", "gas", "renewable", "power", "electricity", "fuels", "solar",
         "wind", "clean energy", "nuclear energy", "efficiency", "fuel"
     ],
     "Infrastructure": [
         "infrastructure", "road","roads", "bridge","bridges", "highway" ,"highways", "transportation", "transit", "rail",
-        "airport" ,"airports", "construction", "public works", "telecom", "broadband", "utilities"
+        "airport","airports", "construction", "public works", "telecom", "broadband", "utilities"
     ],
     "Law and Order": [
-        "crime", "crimes", "justice", "police", "law enforcement", "court", "courts", "prisons", "prison",
+        "crime", "crimes", "justice", "police", "enforcement", "court", "courts", "prisons", "prison",
         "incarceration", "drug", "guns", "lawsuits", "trials"
         "safety", "homicide", "drugs", "violence", "gun", "lawsuit", "trial", "judge"
     ],
     "Social Security & Welfare": [
-        "social security", "welfare", "benefit", "benefits", "disabilitys", "retirement", "pensions", "safety net",
-        "public assistance", "disability", "unemployment insurance", "food stamps"
+        "social", "welfare", "benefit", "benefits", "retirement", "pensions", "safety",
+        "assistance", "disability", "unemployment", "insurance", "stamps"
     ],
     "Veterans": [
         "veterans", "veteran", "VA", "benefits", "military service", "healthcare", "support", "disabled",
         "deployment", "honor", "sacrifice", "transition", "jobs for veterans"
     ],
     "Gun Control": [
-        "gun", "firearm","firearms", "shooting", "second amendment", "NRA", "background checks",
-        "gun violence", "weapon", "assault weapon", "gun control", "shooter"
+        "gun", "firearm","firearms", "shooting", "amendment", "NRA", "checks",
+        "violence", "weapon", "assault", "control", "shooter"
     ],
     "Women’s Rights": [
-        "women", "gender", "reproductive", "abortion", "equality", "women's rights", "maternity",
-        "equal pay", "violence against women", "healthcare for women"
+        "women", "gender", "reproductive", "abortion", "equality", "women's", "maternity",
+        "equal", "rights"
     ],
     "Labor and Unions": [
-        "labor", "union", "worker","workers", "wages", "strike", "collective bargaining", "overtime",
-        "minimum wage", "rights of workers", "blue collar"
+        "labor", "union", "worker", "workers", "wages", "strike", "collective","bargaining", "overtime",
+        "minimum", "rights", "collar", "wage"
     ],
     "Religion": [
-        "faith", "religion", "church", "god", "christian", "muslim", "jewish", "freedom of religion",
-        "worship", "religious liberty", "spiritual", "belief"
+        "faith", "religion", "church", "god", "christian", "muslim", "jewish", "freedom",
+        "worship", "religious", "spiritual", "belief"
     ],
     "Agriculture": [
         "farming", "agriculture", "rural", "farmers", "crops", "livestock", "subsidy", "drought",
-        "harvest", "agricultural policy", "soil", "irrigation"
+        "harvest", "agricultural", "soil", "irrigation"
     ],
     "Transportation": [
         "transportation", "traffic", "transit", "infrastructure", "rail", "bus", "highways",
         "aviation", "freight", "mobility", "logistics"
     ],
     "Racism": ["racism", "racial", "discrimination", "prejudice", "segregation", "inequality",
-    "bias", "bigotry", "systemic racism", "racial justice", "racial equality",
-    "racial profiling", "hate crime", "civil rights", "racial violence",
-    "oppression", "white supremacy", "racial discrimination", "racial disparity",
-    "social justice", "police brutality", "racial segregation"
+    "bias", "bigotry", "justice", "equality",
+    "profiling", "civil rights", "racial violence",
+    "oppression", "supremacy", "racial disparity",
+    "social", "brutality", "segregation"
     ]
 }
 labels = [
