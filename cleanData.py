@@ -1,6 +1,6 @@
 import pandas as pd
 
-def cleanData(path:str):
+def clean_data(path:str):
     presidential_speeches = pd.read_excel(path)
     #remove vice president column
     presidential_speeches = presidential_speeches.drop('Vice President', axis=1)
