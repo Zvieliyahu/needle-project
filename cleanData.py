@@ -14,5 +14,5 @@ def clean_presidential_speeches(path:str):
     #make speech and info lower case
     presidential_speeches['speech'] = presidential_speeches['speech'].str.lower()
     presidential_speeches['info'] = presidential_speeches['info'].str.lower()
-    presidential_speeches['date'] = pd.to_datetime(presidential_speeches['date'], format='%m/%d/%Y')
+    presidential_speeches['date'] = pd.to_datetime(presidential_speeches['date'], errors='coerce')
     return presidential_speeches
