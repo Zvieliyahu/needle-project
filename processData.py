@@ -11,20 +11,17 @@ topics = {
     "Healthcare": [
         "healthcare", "insurance", "patients", "patient", "hospitals", "hospital", "medicare", "medicaid", "affordable",
         "doctors", "doctor", "nurses", "nurse", "medical", "coverage", "public health", "epidemic", "pandemic",
-        "treatments","treatment"
+        "treatments", "treatment"
     ],
     "Education": [
         "education", "school", "schools", "students", "student", "teachers", "teacher", "learn", "learns",
-        "learning", "curriculum", "college", "colleges", "universities", "scholarships" 
-        "university", "scholarship", "literacy", "classroom"
-    ],
-    "Environment": [
-        "environment", "climate", "pollution", "carbon", "emissions", "warming", "green",
-        "sustainability", "renewable", "energy", "solar", "wind", "clean air", "clean water"
+        "learning", "curriculum", "college", "colleges", "universities", "scholarships"
+                                                                         "university", "scholarship", "literacy",
+        "classroom"
     ],
     "Defense": [
         "military", "defense", "forces", "force", "troops", "troop", "security", "war", "weapon", "weapons", "army",
-        "navy", "air force", "nuclear", "terrorism", "strategy", "homeland", "counterterrorism"
+        "navy", "air force", "nuclear", "terrorism", "strategy", "homeland", "counterterrorism", "terrorist"
     ],
     "Foreign Policy": [
         "foreign", "diplomacy", "treaty", "allies", "ambassador", "international", "relations",
@@ -32,28 +29,21 @@ topics = {
     ],
     "Immigration": [
         "immigration", "migrant", "migrants", "border", "borders", "asylum", "visa", "refugee", "refugees",
-        "citizenship", "deportation", "illegal", "undocumented", "green card", "immigrants","immigrant", "amnesty"
+        "citizenship", "deportation", "illegal", "undocumented", "green card", "immigrants", "immigrant", "amnesty"
     ],
     "Civil Rights": [
         "civil", "rights", "equality", "justice", "discrimination", "racism", "segregation", "freedom",
         "injustice", "prejudice", "black", "minorities", "voting rights", "LGBTQ", "gender", "genders"
     ],
     "Technology": [
-        "technology", "innovation", "researches","research", "science", "AI", "artificial",
+        "technology", "innovation", "researches", "research", "science", "AI", "artificial",
         "cybersecurity", "internet", "data", "automation", "engineering", "robotics"
-    ],
-    "Energy": [
-        "energy", "oil", "gas", "renewable", "power", "electricity", "fuels", "solar",
-        "wind", "clean energy", "nuclear energy", "efficiency", "fuel"
-    ],
-    "Infrastructure": [
-        "infrastructure", "road","roads", "bridge","bridges", "highway" ,"highways", "transportation", "transit", "rail",
-        "airport","airports", "construction", "public works", "telecom", "broadband", "utilities"
     ],
     "Law and Order": [
         "crime", "crimes", "justice", "police", "enforcement", "court", "courts", "prisons", "prison",
         "incarceration", "drug", "guns", "lawsuits", "trials"
-        "safety", "homicide", "drugs", "violence", "gun", "lawsuit", "trial", "judge"
+                                                     "safety", "homicide", "drugs", "violence", "gun", "lawsuit",
+        "trial", "judge"
     ],
     "Social Security & Welfare": [
         "social", "welfare", "benefit", "benefits", "retirement", "pensions", "safety",
@@ -64,7 +54,7 @@ topics = {
         "deployment", "honor", "sacrifice", "transition", "jobs for veterans"
     ],
     "Gun Control": [
-        "gun", "firearm","firearms", "shooting", "amendment", "NRA", "checks",
+        "gun", "firearm", "firearms", "shooting", "amendment", "NRA", "checks",
         "violence", "weapon", "assault", "control", "shooter"
     ],
     "Women’s Rights": [
@@ -72,26 +62,35 @@ topics = {
         "equal", "rights"
     ],
     "Labor and Unions": [
-        "labor", "union", "worker", "workers", "wages", "strike", "collective","bargaining", "overtime",
+        "labor", "union", "worker", "workers", "wages", "strike", "collective", "bargaining", "overtime",
         "minimum", "rights", "collar", "wage"
     ],
     "Religion": [
         "faith", "religion", "church", "god", "christian", "muslim", "jewish", "freedom",
         "worship", "religious", "spiritual", "belief"
     ],
+    "Racism": ["racism", "racial", "discrimination", "prejudice", "segregation", "inequality",
+               "bias", "bigotry", "justice", "equality",
+               "profiling", "civil rights", "racial violence",
+               "oppression", "supremacy", "racial disparity",
+               "social", "brutality", "segregation"
+    ],
+    "Environment": [
+        "environment", "climate", "pollution", "carbon", "emissions", "warming", "green",
+        "sustainability", "renewable", "energy", "solar", "wind", "clean air", "clean water"
+    ],
     "Agriculture": [
         "farming", "agriculture", "rural", "farmers", "crops", "livestock", "subsidy", "drought",
         "harvest", "agricultural", "soil", "irrigation"
     ],
-    "Transportation": [
-        "transportation", "traffic", "transit", "infrastructure", "rail", "bus", "highways",
-        "aviation", "freight", "mobility", "logistics"
+    "Energy": [
+        "energy", "oil", "gas", "renewable", "power", "electricity", "fuels", "solar",
+        "wind", "nuclear", "efficiency", "fuel"
     ],
-    "Racism": ["racism", "racial", "discrimination", "prejudice", "segregation", "inequality",
-    "bias", "bigotry", "justice", "equality",
-    "profiling", "civil rights", "racial violence",
-    "oppression", "supremacy", "racial disparity",
-    "social", "brutality", "segregation"
+    "Infrastructure": [
+        "infrastructure", "road", "roads", "bridge", "bridges", "highway", "highways", "transportation", "transit",
+        "rail",
+        "airport", "airports", "construction", "public works", "telecom", "broadband", "utilities"
     ]
 }
 labels = [
@@ -99,18 +98,22 @@ labels = [
     "Education", "Environment", "Law and Order", "Government and Institutions",
     "Technology and Innovation", "Religion and Morality", "Campaign and Politics"
 ]
+
+
 # Extract sentiment per speech
-def extract_sentiments(speech : str) -> float:
+def extract_sentiments(speech: str) -> float:
     blob = TextBlob(speech)
     sentiment = blob.sentiment.polarity
     # possibly process more
     return sentiment
 
-def extract_emotions (speech : str) -> dict:
+
+def extract_emotions(speech: str) -> dict:
     emotion = NRCLex(speech)
     print(emotion.raw_emotion_scores)
 
-def extract_topic(speech:str)->list:
+
+def extract_topic(speech: str) -> list:
     tokens = speech.split()  # tokenize by spaces
     matched_topics = {}
     for topic, keywords in topics.items():

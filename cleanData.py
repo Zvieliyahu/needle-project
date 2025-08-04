@@ -18,4 +18,5 @@ def clean_presidential_speeches(path: str):
     presidential_speeches['date'] = pd.to_datetime(presidential_speeches['date'], errors='coerce')
     # Removing audience reactions
     presidential_speeches['speech'] = presidential_speeches['speech'].str.replace(r'\((.*?)\)', '', regex=True)
+    presidential_speeches['speech'] = presidential_speeches['speech'].str.replace(r'[^\w\s]', '', regex=True)
     return presidential_speeches
