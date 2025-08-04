@@ -54,6 +54,11 @@ emotion_classifier = pipeline(
     truncation=True
 )
 
+stop_words = set(stopwords.words('english')) # | set(non_topic_words)
+nlp = spacy.load("en_core_web_sm")
+for word in non_topic_words:
+    nlp.vocab[word].is_stop = True
+
 
 def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -65,20 +70,17 @@ def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
 
     # Define classification logic
     def get_top_emotion(text):
-        stop_words = set(stopwords.words('english')) # | set(non_topic_words)
-        nlp = spacy.load("en_core_web_sm")
-        for word in non_topic_words:
-            nlp.vocab[word].is_stop = True
+        doc = nlp(text.lower())
 
         tokens = [
-            token.lemma_ for token in text
+            token.lemma_ for token in doc
             if token.is_alpha
                and token.pos_ == "ADJ"  # Only adjectives
                and token.lemma_.lower() not in stop_words
         ]
+
         try:
-            trimmed_text = ' '.join(text.split()[20:])  # trimming the thank you part
-            result = emotion_classifier(text)
+            result = emotion_classifier(' '.join(tokens))
             return result[0][0]['label'] if result else "neutral"
         except Exception as e:
             print(f"Error processing text: {text[:30]}... -> {e}")
