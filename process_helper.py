@@ -13,7 +13,7 @@ TOPICS_FOR_CLASSIFICATION = {
     ],
     "Healthcare": [
         "healthcare", "insurance", "patients", "patient", "hospitals", "hospital", "medicare", "medicaid", "affordable",
-        "doctors", "doctor", "nurses", "nurse", "medical", "coverage", "public health", "epidemic", "pandemic",
+        "doctors", "doctor", "nurses", "nurse", "medical", "coverage", "health", "epidemic", "pandemic",
         "treatments", "treatment"
     ],
     "Education": [
@@ -24,7 +24,7 @@ TOPICS_FOR_CLASSIFICATION = {
     ],
     "Defense": [
         "military", "defense", "forces", "force", "troops", "troop", "security", "war", "weapon", "weapons", "army",
-        "navy", "air force", "nuclear", "terrorism", "strategy", "homeland", "counterterrorism", "terrorist"
+        "navy", "nuclear", "terrorism", "strategy", "homeland", "counterterrorism", "terrorist"
     ],
     "Foreign Policy": [
         "foreign", "diplomacy", "treaty", "allies", "ambassador", "international", "relations",
@@ -32,11 +32,12 @@ TOPICS_FOR_CLASSIFICATION = {
     ],
     "Immigration": [
         "immigration", "migrant", "migrants", "border", "borders", "asylum", "visa", "refugee", "refugees",
-        "citizenship", "deportation", "illegal", "undocumented", "green card", "immigrants", "immigrant", "amnesty"
+        "citizenship", "deportation", "illegal", "undocumented", "greencard", "immigrants", "immigrant", "amnesty"
     ],
     "Civil Rights": [
         "civil", "rights", "equality", "justice", "discrimination", "racism", "segregation", "freedom",
-        "injustice", "prejudice", "black", "minorities", "voting rights", "LGBTQ", "gender", "genders"
+        "injustice", "prejudice", "black", "minorities", "voting", "LGBTQ", "gender", "genders",
+        "equal", "gender", "reproductive", "abortion", "women", "women's", "maternity", "equal"
     ],
     "Technology": [
         "technology", "innovation", "researches", "research", "science", "AI", "artificial",
@@ -57,10 +58,6 @@ TOPICS_FOR_CLASSIFICATION = {
         "gun", "firearm", "firearms", "shooting", "amendment", "NRA", "checks",
         "violence", "weapon", "assault", "control", "shooter"
     ],
-    "Women’s Rights": [
-        "women", "gender", "reproductive", "abortion", "equality", "women's", "maternity",
-        "equal", "rights"
-    ],
     "Labor and Unions": [
         "labor", "union", "worker", "workers", "wages", "strike", "collective", "bargaining", "overtime",
         "minimum", "rights", "collar", "wage"
@@ -71,13 +68,13 @@ TOPICS_FOR_CLASSIFICATION = {
     ],
     "Racism": ["racism", "racial", "discrimination", "prejudice", "segregation", "inequality",
                "bias", "bigotry", "justice", "equality",
-               "profiling", "civil rights", "racial violence",
-               "oppression", "supremacy", "racial disparity",
+               "profiling",
+               "oppression", "supremacy", "disparity",
                "social", "brutality", "segregation"
                ],
     "Environment": [
         "environment", "climate", "pollution", "carbon", "emissions", "warming", "green",
-        "sustainability", "renewable", "energy", "solar", "wind", "clean air", "clean water"
+        "sustainability", "renewable", "energy", "solar", "wind", "air", "water", "clean"
     ],
     "Agriculture": [
         "farming", "agriculture", "rural", "farmers", "crops", "livestock", "subsidy", "drought",
@@ -90,7 +87,7 @@ TOPICS_FOR_CLASSIFICATION = {
     "Infrastructure": [
         "infrastructure", "road", "roads", "bridge", "bridges", "highway", "highways", "transportation", "transit",
         "rail",
-        "airport", "airports", "construction", "public works", "telecom", "broadband", "utilities"
+        "airport", "airports", "construction", "telecom", "broadband", "utilities"
     ]
 }
 labels = [
