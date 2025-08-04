@@ -184,6 +184,13 @@ def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+"""
+                      **********
+                      ** Main **
+                      **********
+"""
+
+
 if __name__ == "__main__":
     speeches_df = clean_presidential_speeches(r'Data\presidential_speeches.xlsx')
     speeches_df['topics'] = speeches_df['speech'].apply(classify_topic)
