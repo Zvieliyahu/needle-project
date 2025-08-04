@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+# create graph of topics vs amount of times
 def graph_count_topics(df):
     # Split the commas
     df_expanded = df.assign(topic=df['topics'].str.split(',')).explode('topic')
@@ -19,6 +21,7 @@ def graph_count_topics(df):
     plt.tight_layout()
     plt.savefig("TopicsVsCount.png")
 
+# create graph of topics vs party
 def graph_party_topic(df):
     # Explode topics (split comma, strip)
     df_expanded = df.assign(topic=df['topics'].str.split(',')).explode('topic')
@@ -67,7 +70,8 @@ def graph_party_topic(df):
     plt.tight_layout()
     plt.savefig("TopicCountsByOnlyRandDPartys.png")
 
-def grpah_time_topics(df):
+# create graph of topics vs time
+def graph_time_topics(df):
     plt.clf()
     df['year'] = pd.to_datetime(df['date']).dt.year
 
@@ -116,9 +120,164 @@ def grpah_time_topics(df):
     plt.savefig("TopicsVsDecades.png")
     plt.show()
 
+# create graph of emotions vs amount of times
 
-df = pd.read_excel('speeches_with_topics.xlsx')
+def graph_count_emotions(df):
+
+    # Count each predicted emotion
+    emotion_counts = df['predicted_emotion'].value_counts()
+
+    # Plot the bar chart
+    plt.figure(figsize=(10, 6))
+    plt.bar(emotion_counts.index, emotion_counts.values, color='skyblue')
+
+    plt.title('Amounts of Predicted Emotions')
+    plt.xlabel('Emotion')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.savefig("EmotionsVsCounts.png")
+
+# create graph of emotions vs party
+def graph_party_emotions(df):
+    df['predicted_emotion'] = df['predicted_emotion'].str.strip().str.lower()
+    df['Party'] = df['Party'].str.strip()
+
+    # Group by party and emotion
+    emotion_party_counts = df.groupby(['Party', 'predicted_emotion']).size().unstack(fill_value=0)
+
+    # Plot
+    emotion_party_counts.T.plot(kind='bar', figsize=(12, 6))  # Transpose so emotions are on x-axis
+
+    plt.title('Emotion Frequency by Party')
+    plt.xlabel('Emotion')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45, ha='right')
+    plt.legend(title='Party')
+    plt.tight_layout()
+    plt.savefig("EmotionsVsPartys.png")
+
+    df_filtered = df[df['Party'].isin(['Democratic', 'Republican'])]
+
+    # Group by party and emotion
+    emotion_party_counts = df_filtered.groupby(['Party', 'predicted_emotion']).size().unstack(fill_value=0)
+
+    # Plot
+    emotion_party_counts.T.plot(kind='bar', figsize=(12, 6))  # Transpose for emotions on x-axis
+
+    plt.title('Emotion Frequency by Party (Democratic & Republican)')
+    plt.xlabel('Emotion')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45, ha='right')
+    plt.legend(title='Party')
+    plt.tight_layout()
+    plt.savefig("EmotionsVsOnlyDandR.png")
+
+# create graph of emotions vs time
+def graph_time_emotions(df):
+    df['year'] = pd.to_datetime(df['date']).dt.year
+    df['predicted_emotion'] = df['predicted_emotion'].str.strip().str.lower()
+
+    # Create a 'decade' column as the starting year of the decade
+    df['decade'] = (df['year'] // 10) * 10
+
+    # Group by decade and emotion
+    emotion_decade = df.groupby(['decade', 'predicted_emotion']).size().reset_index(name='count')
+
+    # Pivot to get decades as index and emotions as columns
+    emotion_pivot = emotion_decade.pivot(index='decade', columns='predicted_emotion', values='count').fillna(0)
+
+    # Plot
+    plt.figure(figsize=(20, 8))
+    emotion_pivot.plot(linewidth=2)
+
+    plt.title('Emotion Trends by Decade')
+    plt.xlabel('Decade')
+    plt.ylabel('Count')
+    plt.xticks(ticks=emotion_pivot.index, labels=emotion_pivot.index, rotation=45, ha='right')
+    plt.grid(True)
+    plt.legend(title='Emotion')
+    plt.tight_layout()
+    plt.savefig("EmotionsVsTime.png")
+
+# create graph per topic and of its emotions
+def graphs_per_topic_of_emotions(df):
+    df['predicted_emotion'] = df['predicted_emotion'].str.strip().str.lower()
+    df['topics'] = df['topics'].astype(str)
+
+    # Explode topics: split multi-topic rows into multiple rows
+    df_expanded = df.assign(topic=df['topics'].str.split(',')).explode('topic')
+    df_expanded['topic'] = df_expanded['topic'].str.strip()
+
+    # Get unique topics
+    unique_topics = df_expanded['topic'].dropna().unique()
+
+    # For each topic, filter and count emotions
+    for topic in unique_topics:
+        topic_df = df_expanded[df_expanded['topic'] == topic]
+
+        # Count the emotions
+        emotion_counts = topic_df['predicted_emotion'].value_counts().sort_values(ascending=False)
+
+        if emotion_counts.empty:
+            continue  # Skip topics with no emotion data
+
+        # Plot
+        plt.figure(figsize=(8, 5))
+        plt.bar(emotion_counts.index, emotion_counts.values, color='skyblue')
+        plt.title(f"Emotions for Topic: {topic}")
+        plt.xlabel("Emotion")
+        plt.ylabel("Count")
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+
+        # Save chart
+        filename = f"{topic.replace(' ', '_')}_emotions.png"
+        plt.savefig(filename)
+        plt.close()
+
+
+    df['predicted_emotion'] = df['predicted_emotion'].str.strip().str.lower()
+    df['topics'] = df['topics'].astype(str)
+
+    # Keep only rows with a single topic (no comma)
+    df_single_topic = df[~df['topics'].str.contains(',')].copy()
+    df_single_topic['topic'] = df_single_topic['topics'].str.strip()
+
+    # Get unique single topics
+    unique_topics = df_single_topic['topic'].dropna().unique()
+
+    # Generate bar chart for each single topic
+    for topic in unique_topics:
+        topic_df = df_single_topic[df_single_topic['topic'] == topic]
+
+        emotion_counts = topic_df['predicted_emotion'].value_counts().sort_values(ascending=False)
+
+        if emotion_counts.empty:
+            continue
+
+        plt.figure(figsize=(8, 5))
+        plt.bar(emotion_counts.index, emotion_counts.values, color='salmon')
+        plt.title(f"Emotions for Topic: {topic} (Single-topic rows only)")
+        plt.xlabel("Emotion")
+        plt.ylabel("Count")
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+
+        filename = f"only_{topic.replace(' ', '_')}_emotions.png"
+        plt.savefig(filename)
+        plt.close()
+
+
+df = pd.read_excel('speeches_with_topics_new.xlsx')
 df = df[df['topics'] != 'None']
 graph_count_topics(df)
 graph_party_topic(df)
-grpah_time_topics(df)
+graph_time_topics(df)
+df = pd.read_excel('speeches_with_emotions_final.xlsx')
+graph_count_emotions(df)
+graph_party_emotions(df)
+graph_time_emotions(df)
+df = pd.read_excel('combined_emotion_and_topic.xlsx')
+df = df[df['topics'] != 'None']
+graphs_per_topic_of_emotions(df)
