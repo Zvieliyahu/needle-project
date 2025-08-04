@@ -1,3 +1,9 @@
+# Positions of tokens to filter for emotion classification:
+ALLOWED_POS = {"ADJ", "VERB", "NOUN", "ADV"}
+
+
+####################################################################################################################
+
 # Common word by topic for classification:
 TOPICS_FOR_CLASSIFICATION = {
     "Economy": [
@@ -92,6 +98,10 @@ labels = [
     "Education", "Environment", "Law and Order", "Government and Institutions",
     "Technology and Innovation", "Religion and Morality", "Campaign and Politics"
 ]
+
+
+####################################################################################################################
+
 
 # Unrelated words to ignore when classifying topics
 UNRELATED_TOPIC_WORDS = [
