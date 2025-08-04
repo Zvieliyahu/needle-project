@@ -3,7 +3,7 @@ import pandas as pd
 from collections import Counter
 import re
 import nltk
-from processData import topics
+from process_data import TOPICS_FOR_CLASSIFICATION
 from typing import Dict, List
 
 nltk.download('stopwords')
@@ -41,7 +41,7 @@ non_topic_words = [
     "and", "or", "but", "if", "because", "while", "as", "until", "when",
     "where", "after", "before", "since", "though", "although", "nor",
     "so", "than", "whether",
-    
+
     # Other words we've missed
     "president", "go", "united", "states", "america", "country", "say", "nation", "world", "american"
 ]
@@ -116,7 +116,7 @@ def get_top_words(text, n=30):
     # print(top_word_list)
     matched_topics = {}
     for word, count in top_words:
-        for topic, keywords in topics.items():
+        for topic, keywords in TOPICS_FOR_CLASSIFICATION.items():
             if word in keywords:
                 if topic in matched_topics.keys():
                     matched_topics[topic] += count
