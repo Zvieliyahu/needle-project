@@ -70,6 +70,34 @@ def graph_party_topic(df):
     plt.tight_layout()
     plt.savefig("TopicCountsByOnlyRandDPartys.png")
 
+    df_expanded = df_expanded[df_expanded['Party'].isin(['Republican', 'Democratic'])]
+
+    # Group by party and topic, count occurrences
+    counts = df_expanded.groupby(['Party', 'topic']).size().reset_index(name='count')
+
+    # Pivot to have topics as index and parties as columns
+    pivot_df = counts.pivot(index='topic', columns='Party', values='count').fillna(0)
+
+    # Calculate total number of speeches per party (across all topics)
+    total_speeches_per_party = pivot_df.sum(axis=0)
+
+    # Calculate the percentage of speeches for each topic by party
+    pivot_df_percentage = pivot_df.div(total_speeches_per_party, axis=1) * 100
+
+    # Plot grouped bar chart for percentage
+    pivot_df_percentage.plot(kind='bar', figsize=(16, 8))
+
+    # Customize plot
+    plt.title('Percentage of Speeches by Democrats and Republicans for Each Topic')
+    plt.xlabel('Topic')
+    plt.ylabel('Percentage (%)')
+    plt.xticks(rotation=45, ha='right')
+    plt.legend(title='Party')
+    plt.tight_layout()
+
+    # Save the plot
+    plt.savefig("TopicPercentageByParty.png")
+
 # create graph of topics vs time
 def graph_time_topics(df):
     plt.clf()
@@ -173,6 +201,38 @@ def graph_party_emotions(df):
     plt.tight_layout()
     plt.savefig("EmotionsVsOnlyDandR.png")
 
+    # Precentage for each party
+
+    emotion_counts = df_filtered.groupby(['Party', 'predicted_emotion']).size().unstack(fill_value=0)
+
+    # Normalize each party's counts separately (row-wise)
+    emotion_percentages = emotion_counts.div(emotion_counts.sum(axis=1), axis=0)
+
+    yticks = np.arange(0, 1.1, 0.1)
+    # Plot for Democratic
+    plt.figure(figsize=(8, 5))
+    emotion_percentages.loc['Democratic'].plot(kind='bar', color='skyblue')
+    plt.title('Emotion Distribution - Democratic (Normalized)')
+    plt.ylabel('Proportion (0 to 1)')
+    plt.xlabel('Emotion')
+    plt.yticks(yticks)
+    plt.ylim(0, 1)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig("DemocraticEmotionDistribution.png")
+
+    # Plot for Republican
+    plt.figure(figsize=(8, 5))
+    emotion_percentages.loc['Republican'].plot(kind='bar', color='salmon')
+    plt.title('Emotion Distribution - Republican (Normalized)')
+    plt.ylabel('Proportion (0 to 1)')
+    plt.xlabel('Emotion')
+    plt.yticks(yticks)
+    plt.ylim(0, 1)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig("RepublicanEmotionDistribution.png")
+
 # create graph of emotions vs time
 def graph_time_emotions(df):
     df['year'] = pd.to_datetime(df['date']).dt.year
@@ -199,6 +259,93 @@ def graph_time_emotions(df):
     plt.legend(title='Emotion')
     plt.tight_layout()
     plt.savefig("EmotionsVsTime.png")
+
+    df['date'] = pd.to_datetime(df['date'])
+
+    # Create a new column for the decade (rounding down the year to the nearest 10)
+    df['decade'] = (df['date'].dt.year // 10) * 10
+
+    # Filter data for Democratic and Republican parties
+    df_democratic = df[df['Party'] == 'Democratic']
+    df_republican = df[df['Party'] == 'Republican']
+
+    # Function to plot emotion trends over decades for a given party
+    def plot_emotion_trends(df_party, party_name, ax, global_max, decade_range):
+        # Group by 'decade' and 'predicted_emotion', and count occurrences
+        emotion_trends = df_party.groupby(['decade', 'predicted_emotion']).size().unstack(fill_value=0)
+
+        # Plotting each emotion as a line on the graph
+        for emotion in emotion_trends.columns:
+            ax.plot(emotion_trends.index, emotion_trends[emotion], label=emotion, marker='o')
+
+        # Title and labels
+        ax.set_title(f'Emotion Trends for {party_name} Party by Decade')
+        ax.set_xlabel('Decade')
+        ax.set_ylabel('Number of Speeches')
+        ax.set_ylim(0, global_max)  # Set the same y-axis limit across all plots
+        ax.set_xlim(decade_range)  # Set the same x-axis limit across all plots
+
+        # Calculate equal x-ticks every 10 years (decades)
+        tick_positions = range(decade_range[0], decade_range[1] + 1, 10)
+        tick_labels = [f'{x}-{x + 9}' for x in tick_positions]
+
+        ax.set_xticks(tick_positions)
+        ax.set_xticklabels(tick_labels)
+
+        ax.grid(True)
+        ax.legend(title='Emotions', loc='upper left', bbox_to_anchor=(1, 1))
+
+    # Combine data for both parties to get the global max value for y-axis
+    emotion_trends_democratic = df_democratic.groupby(['decade', 'predicted_emotion']).size().unstack(fill_value=0)
+    emotion_trends_republican = df_republican.groupby(['decade', 'predicted_emotion']).size().unstack(fill_value=0)
+
+    # Calculate the global max value across both parties (for y-axis)
+    global_max = max(emotion_trends_democratic.max().max(), emotion_trends_republican.max().max()) + 5
+
+    # Get the min and max decades across both parties for the x-axis
+    min_decade = min(emotion_trends_democratic.index.min(), emotion_trends_republican.index.min())
+    max_decade = max(emotion_trends_democratic.index.max(), emotion_trends_republican.index.max())
+    decade_range = (min_decade, max_decade)
+
+    # Combine both party data for the total (combined) plot
+    df_combined = pd.concat([df_democratic, df_republican])
+
+    # Group by decade and emotion for the combined data
+    emotion_trends_combined = df_combined.groupby(['decade', 'predicted_emotion']).size().unstack(fill_value=0)
+
+    # Create subplots (3 rows, 1 column) for the three graphs: Democratic, Republican, and Combined
+    fig, axes = plt.subplots(3, 1, figsize=(20, 18))
+
+    # Plot for Democratic Party
+    plot_emotion_trends(df_democratic, 'Democratic', axes[0], global_max, decade_range)
+
+    # Plot for Republican Party
+    plot_emotion_trends(df_republican, 'Republican', axes[1], global_max, decade_range)
+
+    # Plot for Combined (Both Parties)
+    for emotion in emotion_trends_combined.columns:
+        axes[2].plot(emotion_trends_combined.index, emotion_trends_combined[emotion], label=emotion, marker='o')
+
+    # Title and labels for combined plot
+    axes[2].set_title('Combined Emotion Trends for Both Parties by Decade')
+    axes[2].set_xlabel('Decade')
+    axes[2].set_ylabel('Number of Speeches')
+    axes[2].set_ylim(0, global_max)  # Set the same y-axis limit across all plots
+    axes[2].set_xlim(decade_range)  # Set the same x-axis limit across all plots
+
+    # Calculate equal x-ticks every 10 years (decades)
+    tick_positions = range(decade_range[0], decade_range[1] + 1, 10)
+    tick_labels = [f'{x}-{x + 9}' for x in tick_positions]
+
+    axes[2].set_xticks(tick_positions)
+    axes[2].set_xticklabels(tick_labels)
+
+    axes[2].grid(True)
+    axes[2].legend(title='Emotions', loc='upper left', bbox_to_anchor=(1, 1))
+
+    # Adjust layout for better appearance
+    plt.tight_layout()
+    plt.savefig('BothPartiesEmotionsOverTime.png')
 
 # create graph per topic and of its emotions
 def graphs_per_topic_of_emotions(df):
@@ -269,15 +416,17 @@ def graphs_per_topic_of_emotions(df):
         plt.close()
 
 
-df = pd.read_excel('speeches_with_topics_new.xlsx')
+df = pd.read_excel('speeches_with_topics_different_threshold.xlsx')
 df = df[df['topics'] != 'None']
-graph_count_topics(df)
+# graph_count_topics(df)
 graph_party_topic(df)
-graph_time_topics(df)
-df = pd.read_excel('speeches_with_emotions_final.xlsx')
-graph_count_emotions(df)
-graph_party_emotions(df)
-graph_time_emotions(df)
-df = pd.read_excel('combined_emotion_and_topic.xlsx')
-df = df[df['topics'] != 'None']
-graphs_per_topic_of_emotions(df)
+# graph_time_topics(df)
+# df = pd.read_excel('speeches_with_emotions_final.xlsx')
+# df = pd.read_excel('combined_emotion_and_topic_2.xlsx')
+# df = df[df['predicted_emotion'] != 'neutral']
+# graph_count_emotions(df)
+# graph_party_emotions(df)
+# graph_time_emotions(df)
+# df = pd.read_excel('combined_emotion_and_topic_2.xlsx')
+# df = df[df['topics'] != 'None']
+# graphs_per_topic_of_emotions(df)
