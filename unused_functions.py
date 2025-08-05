@@ -20,3 +20,16 @@ def extract_topic(speech: str) -> list:
     filtered_topics = {topic: data for topic, data in matched_topics.items() if data["count"] > 2}
     filtered_topic_names = list(filtered_topics.keys())
     return filtered_topic_names
+
+
+
+def extract_sentiments(speech: str) -> float:
+    """
+    Extract a sentiment from a speech, score > 0 is positive, score < 0 is negative.
+    :param speech: string of speech
+    :return: positivity score
+    """
+    blob = TextBlob(remove_thanking_phrases(speech))
+    sentiment = blob.sentiment.polarity
+    # possibly process more
+    return sentiment

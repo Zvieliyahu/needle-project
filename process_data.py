@@ -7,7 +7,7 @@ from nltk.corpus import stopwords
 import spacy
 from collections import Counter
 from cleanData import clean_presidential_speeches
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 import re
 from tqdm import tqdm
 tqdm.pandas()
@@ -30,8 +30,12 @@ for word in UNRELATED_TOPIC_WORDS:
     nlp.vocab[word].is_stop = True
 
 # GLOBALS - Topic Predictions:
-FIRST_THRESHOLD = 0.6
-SECOND_THRESHOLD = 0.8
+# FIRST_THRESHOLD = 0.6
+FIRST_THRESHOLD = 0.4
+# SECOND_THRESHOLD = 0.8
+SECOND_THRESHOLD = 0.7
+
+MIN_WORDS_COUNTED = 5
 
 
 def predict_topics(words_by_topic: Dict) -> str:
@@ -47,6 +51,10 @@ def predict_topics(words_by_topic: Dict) -> str:
     total_count = 0
     for c in words_by_topic.values():
         total_count += c
+
+    # Returning None if there is not enough information
+    if total_count <= MIN_WORDS_COUNTED:
+        return "None"
 
     # Normalizing count by topics
     normalized_count = {}
@@ -118,16 +126,52 @@ def classify_topic(text, n=30):
                       ###########################
 """
 
-def extract_sentiments(speech: str) -> float:
+sentiment_pipeline = pipeline("sentiment-analysis")
+CHUNK_SIZE = 350
+
+
+def extract_sentiments(speech: str):
     """
-    Extract a sentiment from a speech, score > 0 is positive, score < 0 is negative.
+    Extract a sentiment from a speech, with a label "positive" or "negative" and a score
+    between 0 and 1 (0 being most negative and 1 most positive)
     :param speech: string of speech
-    :return: positivity score
+    :return: a dict of label: score
     """
-    blob = TextBlob(speech)
-    sentiment = blob.sentiment.polarity
-    # possibly process more
-    return sentiment
+    cleaned = remove_thanking_phrases(speech)
+
+    # Simple word-based chunking approximation
+    words = cleaned.split()
+    chunks = [" ".join(words[i:i + CHUNK_SIZE]) for i in range(0, len(words), CHUNK_SIZE)]
+
+    labels = []
+    scores = []
+
+    for chunk in chunks:
+        result = sentiment_pipeline(chunk, truncation=True)[0]
+        label = result['label']
+        score = result['score']
+
+        # Convert label & score to positivity score
+        positivity_score = score if label == "POSITIVE" else 1 - score
+
+        labels.append(label)
+        scores.append(positivity_score)
+
+    # Majority label
+    majority_label = Counter(labels).most_common(1)[0][0]
+    avg_score = sum(scores) / len(scores)
+
+    return {
+        "label": majority_label,
+        "positivity_score": round(avg_score, 4)
+    }
+
+
+"""
+                      #########################
+                      ## Emotion Predictions ##
+                      #########################
+"""
 
 
 # Load the GoEmotions classifier
@@ -192,8 +236,50 @@ def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    speeches_df = clean_presidential_speeches(r'Data\presidential_speeches.xlsx')
-    speeches_df['topics'] = speeches_df['speech'].apply(classify_topic)
-    # speeches_df.to_excel("speeches_with_topics.xlsx", index=False)
-    result_df = classify_emotion(speeches_df)
+    #
+    # speeches_df = clean_presidential_speeches(r'Data\presidential_speeches.xlsx')
+    # sentiment_results = speeches_df['speech'].apply(extract_sentiments)
+    #
+    # # Convert the series of dicts into a DataFrame with separate columns
+    # sentiment_df = sentiment_results.apply(pd.Series)
+    #
+    # # Join the new sentiment columns to your original DataFrame
+    # speeches_df = pd.concat([speeches_df, sentiment_df], axis=1)
+    #
+    # # Save the updated DataFrame
+    # speeches_df.to_excel("speeches_with_sentiment.xlsx", index=False)
+    #
+
+    # speeches_df['topics'] = speeches_df['speech'].apply(classify_topic)
+    # speeches_df.to_excel("speeches_with_topics_different_threshold.xlsx", index=False)
+
+    # result_df = classify_emotion(speeches_df)
     # result_df.to_excel("speeches_with_emotions.xlsx", index=False)
+
+    # Load all data
+    speeches_with_sentiment_df = pd.read_excel(r'speeches_with_sentiment.xlsx')
+    speeches_with_emotions_df = pd.read_excel(r'speeches_with_emotions_final.xlsx')
+    speeches_with_topics_df = pd.read_excel(r'speeches_with_topics_different_threshold.xlsx')
+
+    # Adjust sentiment labels if needed
+    speeches_with_sentiment_df.loc[
+        speeches_with_sentiment_df['positivity_score'].between(0.4, 0.6, inclusive='both'),
+        'label'
+    ] = 'NEUTRAL'
+
+    # Merge all three DataFrames on the 'speech' column
+    combined_df = speeches_with_emotions_df.merge(
+        speeches_with_topics_df[['speech', 'topics']],
+        on='speech',
+        how='left'
+    ).merge(
+        speeches_with_sentiment_df[['speech', 'label', 'positivity_score']],
+        on='speech',
+        how='left'
+    )
+
+    # Save to Excel
+    combined_df.to_excel("combined_predictions.xlsx", index=False)
+
+
+
