@@ -6,13 +6,25 @@ POSITIVITY_THRESHOLD = 0.8
 NEGATIVITY_THRESHOLD = 0.2
 
 
-def plot_positivity_by_emotion(path: str, plot_filter: str):
-    # Load the final merged DataFrame
+def assign_label(score):
+    """
+    Assigning label for coloring the plot bar.
+    :param score: positivity score
+    :return: label
+    """
+    return 'POSITIVE' if score >= 0.5 else 'NEGATIVE'
+
+
+def plot_positivity_by_emotion(path: str, plot_filter=""):
+    """
+    Plotting a bar plot to see correlation between positivity score and emotion.
+    :param path: a path for an Excel file
+    :param plot_filter: added to the title to indicate what kind of filtering had been done on the Excel file
+    :return:
+    """
     df = pd.read_excel(path)
 
-    # Step 1: Filter rows where sentiment is strongly positive or negative
-
-    # Step 2: Group by emotion and calculate average sentiment score and count
+    # Group by emotion and calculate average sentiment score and count
     avg_sentiment_per_emotion = (
         df
         .groupby('predicted_emotion')
@@ -23,17 +35,13 @@ def plot_positivity_by_emotion(path: str, plot_filter: str):
         .reset_index()
     )
 
-    # Step 3: Assign sentiment labels for coloring only
-    def assign_label(score):
-        return 'POSITIVE' if score >= 0.5 else 'NEGATIVE'
-
     avg_sentiment_per_emotion['sentiment_label'] = avg_sentiment_per_emotion['positivity_score'].apply(assign_label)
 
-    # Step 4: Assign bar colors based on sentiment label
+    # Assign bar colors based on sentiment label
     color_map = {'POSITIVE': 'blue', 'NEGATIVE': 'red'}
     bar_colors = avg_sentiment_per_emotion['sentiment_label'].map(color_map)
 
-    # Step 5: Plot
+    # Plot
     plt.figure(figsize=(12, 6))
     bars = plt.bar(
         avg_sentiment_per_emotion['predicted_emotion'],
@@ -66,7 +74,7 @@ def plot_positivity_by_emotion(path: str, plot_filter: str):
     plt.xticks(rotation=45)
     plt.tight_layout()
 
-    # Add legend (colors only)
+    # Add legend
     legend_elements = [
         Patch(facecolor='blue', label='Positive'),
         Patch(facecolor='red', label='Negative')
@@ -80,18 +88,18 @@ def plot_positivity_by_emotion(path: str, plot_filter: str):
 
 def plot_positivity_by_emotion_with_thresholds(positivity_threshold=0.8, negativity_threshold=0.2):
     """
-    Making a plot to see the correlation between emotions prediction and positivity
+    Making a plot to see the correlation between emotions prediction and positivity based on thresholds to
+    filter how negative (close to 0) / positive (close to 1) a speech is.
     :param positivity_threshold:
     :param negativity_threshold:
     :return:
     """
-    # Load the final merged DataFrame
     df = pd.read_excel("combined_predictions.xlsx")
 
-    # Step 1: Filter rows where sentiment is strongly positive or negative
+    # Filter rows where sentiment is strongly positive or negative
     filtered_df = df[(df['positivity_score'] > positivity_threshold) | (df['positivity_score'] < negativity_threshold)]
 
-    # Step 2: Group by emotion and calculate average sentiment score and count
+    # Group by emotion and calculate average sentiment score and count
     avg_sentiment_per_emotion = (
         filtered_df
         .groupby('predicted_emotion')
@@ -102,17 +110,14 @@ def plot_positivity_by_emotion_with_thresholds(positivity_threshold=0.8, negativ
         .reset_index()
     )
 
-    # Step 3: Assign sentiment labels for coloring only
-    def assign_label(score):
-        return 'POSITIVE' if score >= 0.5 else 'NEGATIVE'
-
+    # Assign sentiment labels for coloring only
     avg_sentiment_per_emotion['sentiment_label'] = avg_sentiment_per_emotion['positivity_score'].apply(assign_label)
 
-    # Step 4: Assign bar colors based on sentiment label
+    # Assign bar colors based on sentiment label
     color_map = {'POSITIVE': 'blue', 'NEGATIVE': 'red'}
     bar_colors = avg_sentiment_per_emotion['sentiment_label'].map(color_map)
 
-    # Step 5: Plot
+    # Plot
     plt.figure(figsize=(12, 6))
     bars = plt.bar(
         avg_sentiment_per_emotion['predicted_emotion'],
@@ -159,7 +164,7 @@ def plot_positivity_by_emotion_with_thresholds(positivity_threshold=0.8, negativ
 
 def print_statics_by_emotion():
     """
-    Getting basic statistics to try to analyze what threshold to set
+    Getting basic statistics to try to analyze what threshold to set for removing emotion predictions.
     :return:
     """
     df = pd.read_excel("combined_predictions.xlsx")
@@ -200,6 +205,12 @@ POSITIVE_EMOTIONS = ["joy"]
 
 
 def filter_data_based_on_emotion_and_sentiment(positivity_threshold=0.8, negativity_threshold=0.2):
+    """
+    Filter rows based on positivity score thresholds.
+    :param positivity_threshold: filter positive label scores (lower bound for high scores)
+    :param negativity_threshold: filter negative label scores (upper bound for low scores)
+    :return: data frame where rows not above/beneath the threshold removed
+    """
     df = pd.read_excel("combined_predictions.xlsx")
     emotions = set(df['predicted_emotion'].values)
 
