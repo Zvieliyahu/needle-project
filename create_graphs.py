@@ -443,12 +443,59 @@ def graphs_per_topic_of_emotions(df):
         plt.savefig(filename)
         plt.close()
 
+def graphs_per_president(df):
+    # Create graph of topic and emotions distribution
+    pd.set_option('display.max_columns', None)
+    print(df.head())
+    df_expanded = df.assign(topic=df['topics'].str.split(',')).explode('topic')
+    df_expanded['topic'] = df_expanded['topic'].str.strip()
+    df_expanded['date'] = pd.to_datetime(df_expanded['date'])
+    topic_counts = df_expanded.groupby(['President', 'topic']).size().reset_index(name='count')
 
-df = pd.read_excel('speeches_with_topics_different_threshold.xlsx')
-df = df[df['topics'] != 'None']
-graph_count_topics(df)
-graph_party_topic(df)
-graph_time_topics(df)
+    # Group emotion counts per president
+    emotion_counts = df.groupby(['President', 'predicted_emotion']).size().reset_index(name='count')
+
+    # Unique presidents
+    presidents = df['President'].unique()
+
+    for president in presidents:
+        # Filter topic data for president
+        df_pres_topics = topic_counts[topic_counts['President'] == president].sort_values(by='count', ascending=False)
+
+        # Filter emotion data for president
+        df_pres_emotions = emotion_counts[emotion_counts['President'] == president].sort_values(by='count',
+                                                                                                ascending=False)
+
+        # Get year range for this president
+        df_pres_dates = df[df['President'] == president]
+        min_year = df_pres_dates['date'].dt.year.min()
+        max_year = df_pres_dates['date'].dt.year.max()
+
+        # --- Plot Topics ---
+        plt.figure(figsize=(16, 8))
+        plt.bar(df_pres_topics['topic'], df_pres_topics['count'], color='skyblue')
+        plt.title(f"Topics Discussed by {president} ({min_year} - {max_year})")
+        plt.xlabel("Topic")
+        plt.ylabel("Number of Speeches")
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.savefig(f"{president} topics.png")
+
+        # --- Plot Emotions ---
+        plt.figure(figsize=(16, 8))
+        plt.bar(df_pres_emotions['predicted_emotion'], df_pres_emotions['count'], color='coral')
+        plt.title(f"Predicted Emotions of Speeches by {president} ({min_year} - {max_year})")
+        plt.xlabel("Predicted Emotion")
+        plt.ylabel("Number of Speeches")
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.savefig(f"{president} emotions.png")
+
+# df = pd.read_excel('speeches_with_topics_different_threshold.xlsx')
+# df = df[df['topics'] != 'None']
+# graph_count_topics(df)
+# graph_party_topic(df)
+# graph_time_topics(df)
 # df = pd.read_excel('speeches_with_emotions_final.xlsx')
 # df = pd.read_excel('emotions_filtered_by_positivity_label.xlsx')
 # df = df[df['predicted_emotion'] != 'neutral']
@@ -458,3 +505,15 @@ graph_time_topics(df)
 # df = pd.read_excel('combined_emotion_and_topic_2.xlsx')
 # df = df[df['topics'] != 'None']
 # graphs_per_topic_of_emotions(df)
+
+df = pd.read_excel('combined_predictions.xlsx')
+df = df[df['topics'] != 'None']
+df = df[df['predicted_emotion'] != 'neutral']
+counts = df['President'].value_counts()
+
+# Step 2: Get the top 10 presidents with the most rows
+top_10_presidents = counts.head(10).index
+
+# Step 3: Filter the DataFrame to only include those top 10 presidents
+df_top_10 = df[df['President'].isin(top_10_presidents)]
+graphs_per_president(df_top_10)
