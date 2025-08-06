@@ -2,9 +2,27 @@ import wordcloud
 import matplotlib.pyplot as plt
 import pandas as pd
 from process_helper import *
+import spacy
+import en_core_web_sm
+nlp = en_core_web_sm.load()
 
-ANOTHER_UNRELATED_TOPIC_WORDS = ['without','part','said','years','year', 'first', 'two', 'cut', 'weve','upon', 'one', 'now', 'may', 'day', 'made', 'every', 'thats', 'americans', 'going']
+# Define your custom list
+ANOTHER_UNRELATED_TOPIC_WORDS = ['without', 'part', 'said', 'years', 'year', 'first', 'two', 'cut',
+                                 'weve', 'upon', 'one', 'now', 'may', 'day', 'made', 'every', 'thats',
+                                 'americans', 'going']
 
+# Define your own irrelevant topic words
+non_topic_words = ['government', 'people', 'nation', 'country', 'america', 'american']
+
+# Mark them as stop words in spaCy
+for word in non_topic_words:
+    lex = nlp.vocab[word]
+    lex.is_stop = True
+
+# Combine all stopwords
+combined_stopwords = set(wordcloud.STOPWORDS) | set(UNRELATED_TOPIC_WORDS) | \
+                     set(ANOTHER_UNRELATED_TOPIC_WORDS) | set(non_topic_words) | \
+                     set(nlp.Defaults.stop_words)
 def create_word_cloud(df : pd.DataFrame):
     years = [(1789, 1899), (1900, 1949), (1950, 1979), (1980, 2021)]
     df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y')
@@ -17,11 +35,8 @@ def create_word_cloud(df : pd.DataFrame):
             # Concatenate all speeches into a single string
             text = " ".join(speech for speech in filtered_df['speech'])
 
-            # Create a stopwords set to exclude common words
-            stopwords = set(wordcloud.STOPWORDS).union(UNRELATED_TOPIC_WORDS).union(ANOTHER_UNRELATED_TOPIC_WORDS)
-
             # Generate the word cloud
-            wc = wordcloud.WordCloud(width=800, height=400, background_color='white', stopwords=stopwords).generate(
+            wc = wordcloud.WordCloud(width=800, height=400, background_color='white', stopwords=combined_stopwords).generate(
                 text)
 
             # Plot the word cloud
