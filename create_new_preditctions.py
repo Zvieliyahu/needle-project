@@ -1,4 +1,5 @@
 from filter_topic import *
+from process_data import *
 
 if __name__ == '__main__':
     original_speeches_df = clean_presidential_speeches('Data/presidential_speeches.xlsx')
@@ -12,5 +13,6 @@ if __name__ == '__main__':
 
     topic_speeches_df = classify_emotion(topic_speeches_df)
 
+    topic_speeches_df['topics'] = topic_speeches_df['speech'].apply(classify_topic)
     # Saving filtered data frame
-    topic_speeches_df.to_excel(f"second predictions/emotion_and_positivity_predictions.xlsx", index=False)
+    topic_speeches_df.to_excel(f"emotion_and_positivity_predictions.xlsx", index=False)
