@@ -132,7 +132,8 @@ UNRELATED_TOPIC_WORDS = [
     "so", "than", "whether",
 
     # Other words we've missed
-    "president", "go", "united", "states", "america", "country", "say", "nation", "world", "american"
+    "president", "go", "united", "states", "america", "country", "say", "nation", "world", "american",
+    "state", "may", "one", "upon", "every", "day", "without"
 ]
 
 ####################################################################################################################

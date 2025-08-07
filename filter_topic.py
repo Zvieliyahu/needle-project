@@ -4,6 +4,7 @@ import pandas as pd
 from collections import Counter
 from tqdm import tqdm
 from filter_topic_helper import *
+from cleanData import clean_presidential_speeches
 
 
 def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
@@ -16,7 +17,6 @@ def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
 
     def get_top_emotion(text):
         try:
-            # Split into word chunks (no NLP filtering)
             words = text.split()
             chunks = [" ".join(words[i:i + CHUNK_SIZE]) for i in range(0, len(words), CHUNK_SIZE)]
 
@@ -69,16 +69,22 @@ def assign_positivity_label(speech: str) -> Dict:
         labels.append(label)
         scores.append(score)
 
+    if not labels:
+        return {
+            "label": "unknown",
+            "confidence": -1
+        }
+
     majority_label = Counter(labels).most_common(1)[0][0]
     avg_score = sum(scores) / len(scores)
 
     return {
         "label": majority_label,
-        "positivity_score": round(avg_score, 4)
+        "confidence": round(avg_score, 4)
     }
 
 
-def detect_words(text: List[str], keywords: List[str], important_keywords: List[str], min_appearances=0):
+def detect_words(text: str, keywords: List[str], important_keywords: List[str], min_appearances=0):
     """
     Detect given words in a speech.
     :param important_keywords: important keywords that must appear in the text
@@ -125,23 +131,35 @@ def cut_speech(text: str, important_keywords: List[str], num_of_extra_words=60):
     :return: a substring of the text sliced based on input or an empty string if did not find keywords
     """
     text_lower = text.lower()
-    words = re.findall(r'\b\w+\b', text_lower)
 
-    # Lowercase all keywords for comparison
-    keywords_lower = [kw.lower() for kw in important_keywords]
+    # Find all match positions of important keywords using regex
+    match_spans = []
+    for kw in important_keywords:
+        pattern = r'\b' + re.escape(kw.lower()) + r'\b'
+        for match in re.finditer(pattern, text_lower):
+            match_spans.append((match.start(), match.end()))
 
-    # Track positions of important keywords
-    keyword_indices = [i for i, word in enumerate(words) if word.lower() in keywords_lower]
-
-    if not keyword_indices:
+    if not match_spans:
         print("ERROR: Failed to find at least one keyword.")
-        return ""  # No keyword found
+        return ""
 
-    first_idx = max(keyword_indices[0] - num_of_extra_words, 0)
-    last_idx = min(keyword_indices[-1] + num_of_extra_words + 1, len(words))
+    # Determine cut region by character positions
+    first_match_start = min(start for start, _ in match_spans)
+    last_match_end = max(end for _, end in match_spans)
 
-    # Slice the words and return the cut segment
-    selected_words = words[first_idx:last_idx]
+    # Convert character range to word-based range for padding
+    words = re.findall(r'\b\w+\b', text_lower)
+    word_starts = [m.start() for m in re.finditer(r'\b\w+\b', text_lower)]
+
+    # Find word indices closest to match boundaries
+    first_word_index = next((i for i, pos in enumerate(word_starts) if pos >= first_match_start), 0)
+    last_word_index = next((i for i, pos in enumerate(word_starts) if pos >= last_match_end), len(words) - 1)
+
+    # Add padding
+    first_word_index = max(0, first_word_index - num_of_extra_words)
+    last_word_index = min(len(words) - 1, last_word_index + num_of_extra_words)
+
+    selected_words = words[first_word_index:last_word_index + 1]
     return ' '.join(selected_words)
 
 
@@ -158,7 +176,7 @@ def find_speeches_with_keywords(file_path: str, keywords: List[str], important_k
     :param topic: the name of the topic
     :return: a data frame of the topic related parts of the texts that was classified to the given topic
     """
-    speeches_df = pd.read_excel(file_path)
+    speeches_df = clean_presidential_speeches(file_path)
 
     results = speeches_df['speech'].apply(lambda x: detect_words(x, keywords, important_keywords, appearance_threshold))
 
@@ -171,29 +189,36 @@ def find_speeches_with_keywords(file_path: str, keywords: List[str], important_k
     topic_speeches_df.to_excel(f"{directory}whole_speeches_that_include_{topic}_keywords.xlsx", index=False)
 
     # Filtering original speeches
-    original_speeches_df = pd.read_excel('Data/presidential_speeches.xlsx')
-    filtered_original_df = original_speeches_df.loc[topic_speeches_df.index]
+    # original_speeches_df = pd.read_excel('Data/presidential_speeches.xlsx')
+    # filtered_original_df = original_speeches_df.loc[topic_speeches_df.index]
 
     # Cutting speech for relevant part only
-    filtered_original_df['speech'] = filtered_original_df['speech'].apply(
+    topic_speeches_df['speech'] = topic_speeches_df['speech'].apply(
         lambda x: cut_speech(x, important_keywords, num_of_extra_words=60)
     )
-    filtered_original_df['topic'] = topic
+    topic_speeches_df['topic'] = topic
 
     # Adding sentiment and emotion: #
-    sentiment_results = filtered_original_df['speech'].apply(assign_positivity_label)
-    # Convert the series of dicts into a DataFrame with separate columns
     tqdm.pandas()
+    sentiment_results = topic_speeches_df['speech'].progress_apply(assign_positivity_label)
+    # Convert the series of dicts into a DataFrame with separate columns
     sentiment_df = sentiment_results.apply(pd.Series)
     # Join the new sentiment columns to your original DataFrame
-    filtered_original_df = pd.concat([filtered_original_df, sentiment_df], axis=1)
+    topic_speeches_df = pd.concat([topic_speeches_df, sentiment_df], axis=1)
 
-    filtered_original_df = classify_emotion(filtered_original_df)
+    topic_speeches_df = classify_emotion(topic_speeches_df)
 
     # Saving filtered data frame
-    filtered_original_df.to_excel(f"{directory}cutted_speeches_that_include_{topic}_keywords.xlsx", index=False)
-    return filtered_original_df.copy()
+    topic_speeches_df.to_excel(f"{directory}cutted_speeches_that_include_{topic}_keywords.xlsx", index=False)
+    return topic_speeches_df.copy()
 
 
 if __name__ == '__main__':
-    find_speeches_with_keywords(FILE_PATH, IMMIGRATION_KEYWORDS, MOST_IMPORTANT_KEYWORDS_IMMIGRATION,MIN_APPEARANCES, DIRECTORY, "immigration")
+    # find_speeches_with_keywords(FILE_PATH_IMMIGRATION, IMMIGRATION_KEYWORDS, MOST_IMPORTANT_KEYWORDS_IMMIGRATION,
+    #                             MIN_APPEARANCES, DIRECTORY_IMMIGRATION, "immigration")
+    # find_speeches_with_keywords(FILE_PATH_BLACK_RIGHTS, BLACK_RIGHTS_KEYWORD, MOST_IMPORTANT_BLACK_RIGHTS_KEYWORDS,
+    #                             MIN_APPEARANCES, DIRECTORY_BLACK_RIGHTS, "black_rights")
+    # find_speeches_with_keywords(FILE_PATH, WOMEN_RIGHTS_KEYWORDS, MOST_IMPORTANT_KEYWORDS_WOMEN_RIGHTS,
+    #                             MIN_APPEARANCES, DIRECTORY_WOMEN_RIGHTS, "womens_rights")
+    find_speeches_with_keywords(FILE_PATH, NATIVE_AMERICANS_KEYWORDS, MOST_IMPORTANT_KEYWORDS_NATIVE_AMERICANS,
+                                MIN_APPEARANCES, DIRECTORY_NATIVE_AMERICANS, "native_americans")
