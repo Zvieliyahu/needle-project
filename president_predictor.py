@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 from predictor_helper import *
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
@@ -32,9 +33,9 @@ def create_presidents_vectors(df):
         speeches = group[FEATURE_COLUMNS].values
         weights = group['length'].values
 
-        if len(group) >= 20:
+        if len(group) >= 60:
             # === Case 1: Use KMeans to cluster speeches ===
-            kmeans = KMeans(n_clusters=20, random_state=42)
+            kmeans = KMeans(n_clusters=60, random_state=42)
             cluster_labels = kmeans.fit_predict(speeches)
         else:
             # === Case 2: Assign each speech to its own cluster ===
@@ -94,10 +95,7 @@ def president_predict(text : str):
     most_similar_row = df_president.iloc[most_similar_index]
 
     # Step 8: Print or use the result
-    count += 1
-    if(count % 40 == 0):
-        print(count)
-    return most_similar_row["President"]
+    return input_vector, most_similar_row["President"]
 
 def test_loss(input_vector):
     input_vector = input_vector[FEATURE_COLUMNS]
@@ -131,11 +129,24 @@ def misclassification_loss(df):
     print('Incorrect predictions: ', incorrect)
     print('Incorrect predictions \ total: ', incorrect / total)
 
-df = pd.read_excel('combined_predictions.xlsx')
-df = df[df['topics'] != 'None']
-df = df[df['predicted_emotion'] != 'neutral']
-create_presidents_vectors(df)
-df = pd.read_excel("database_vectors_president.xlsx")
-df['predicted_president'] = df.apply(test_loss, axis=1)
-misclassification_loss(df)
-df.to_excel("president_prediction_result.xlsx", index=False)
+# df = pd.read_excel('combined_predictions.xlsx')
+# df = df[df['topics'] != 'None']
+# df = df[df['predicted_emotion'] != 'neutral']
+# create_presidents_vectors(df)
+# df = pd.read_excel("database_vectors_president.xlsx")
+# df['predicted_president'] = df.apply(test_loss, axis=1)
+# misclassification_loss(df)
+# df.to_excel("president_prediction_result.xlsx", index=False)
+# st.title("Political President Predictor")
+#
+# st.write("Enter a political speech or text below to predict to which **president** it aligns the most.")
+#
+# text_input = st.text_area("Input speech text here:", height=200)
+#
+# if st.button("Predict"):
+#     if text_input.strip():
+#         with st.spinner("Analyzing..."):
+#             input_vector,president = president_predict(text_input)
+#         st.success(f"Predicted President: **{president}**")
+#     else:
+#         st.warning("Please enter some text to analyze.")
