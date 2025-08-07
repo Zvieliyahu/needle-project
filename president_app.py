@@ -45,11 +45,13 @@ party_colors = {
 if st.button("Predict", key="predict_button"):
     if text_input.strip():
         with st.spinner("Analyzing..."):
-            input_vector, president = president_predict(
+            input_vector, president,top_features = president_predict(
                 text_input)  # your function returns the vector (same dim as features) and predicted president
 
             st.success(f"Predicted President: **{president}**")
-
+            st.markdown("#### Top 5 Most Similar Features:")
+            for feature in top_features:
+                st.write(f"• {feature}")
             # Standardize the input vector using the fitted scaler
             input_scaled = scaler.transform(np.array(input_vector).reshape(1, -1))
             # Apply PCA transform to the input

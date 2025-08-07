@@ -93,10 +93,15 @@ def president_predict(text : str):
 
     # Step 7: Get the most similar row
     most_similar_row = df_president.iloc[most_similar_index]
+    matched_vector = most_similar_row[FEATURE_COLUMNS].values.astype(float)
+    input_values = input_vector.values.flatten().astype(float)
+    differences = abs(input_values - matched_vector)
+    top_features_idx = differences.argsort()[:5]
+    top_features = [FEATURE_COLUMNS[i] for i in top_features_idx]
+    # === NEW CODE ENDS HERE ===
 
+    return input_vector, most_similar_row["President"], top_features
     # Step 8: Print or use the result
-    return input_vector, most_similar_row["President"]
-
 def test_loss(input_vector):
     input_vector = input_vector[FEATURE_COLUMNS]
     csv_vectors = df_president[FEATURE_COLUMNS].values

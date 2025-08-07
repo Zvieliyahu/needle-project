@@ -85,15 +85,30 @@ def predict_party(text : str):
 
     # Step 7: Get the most similar row
     most_similar_row = df_party.iloc[most_similar_index]
+    matched_vector = most_similar_row[FEATURE_COLUMNS].values.astype(float)
+    input_values = input_vector.values.flatten().astype(float)
+
+    # Compute absolute differences
+    differences = abs(input_values - matched_vector)
+
+    # Get top 5 closest feature names
+    top_features_idx = differences.argsort()[:5]
+    top_features = [FEATURE_COLUMNS[i] for i in top_features_idx]
+
+    count += 1
+    if count % 40 == 0:
+        print(count)
+
+    return most_similar_row["Party"], top_features
 
     # Step 8: Print or use the result
     # print("Most similar row:")
     # print(most_similar_row["Party"])
     # print(f"Cosine similarity: {similarities[most_similar_index]:.4f}")
-    count += 1
-    if(count % 40 == 0):
-        print(count)
-    return most_similar_row["Party"]
+    # count += 1
+    # if(count % 40 == 0):
+    #     print(count)
+    # return most_similar_row["Party"]
 
 
 def test_loss(input_vector):
@@ -150,7 +165,10 @@ text_input = st.text_area("Input speech text here:", height=200)
 if st.button("Predict"):
     if text_input.strip():
         with st.spinner("Analyzing..."):
-            party = predict_party(text_input)
+            party, top_features = predict_party(text_input)
         st.success(f"Predicted Party: **{party}**")
+        st.markdown("#### Top 5 Most Similar Features:")
+        for feature in top_features:
+            st.write(f"• {feature}")
     else:
         st.warning("Please enter some text to analyze.")
