@@ -148,7 +148,8 @@ def misclassification_loss(df):
 
 create_database_vectors(pd.read_excel("emotion_and_positivity_predictions.xlsx"))
 df = pd.read_csv("Data\cleantext_JoeBiden.tsv", sep="\t")
-filtered_df = df[df['CleanText'].notna() & (df['CleanText'].str.strip() != '')]
+filtered_df = df[['CleanText', 'Date']]
+filtered_df = filtered_df[filtered_df['CleanText'].notna() & (filtered_df['CleanText'].str.strip() != '')]
 filtered_df['Party'] = 'Democratic'
 filtered_df.to_csv("check_biden.csv")
 filtered_df['predicted_party'] = filtered_df['CleanText'].apply(lambda text: predict_party(text)[0])
