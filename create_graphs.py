@@ -497,23 +497,22 @@ def graphs_per_president(df):
 # graph_party_topic(df)
 # graph_time_topics(df)
 # df = pd.read_excel('speeches_with_emotions_final.xlsx')
-# df = pd.read_excel('emotions_filtered_by_positivity_label.xlsx')
+# df = pd.read_excel('emotion_and_positivity_predictions.xlsx')
 # df = df[df['predicted_emotion'] != 'neutral']
 # graph_count_emotions(df)
 # graph_party_emotions(df)
 # graph_time_emotions(df)
-# df = pd.read_excel('combined_emotion_and_topic_2.xlsx')
+# df = pd.read_excel('emotion_and_positivity_predictions.xlsx')
 # df = df[df['topics'] != 'None']
 # graphs_per_topic_of_emotions(df)
-
-df = pd.read_excel('combined_predictions.xlsx')
-df = df[df['topics'] != 'None']
-df = df[df['predicted_emotion'] != 'neutral']
-counts = df['President'].value_counts()
-
-# Step 2: Get the top 10 presidents with the most rows
-top_10_presidents = counts.head(10).index
-
-# Step 3: Filter the DataFrame to only include those top 10 presidents
-df_top_10 = df[df['President'].isin(top_10_presidents)]
-graphs_per_president(df_top_10)
+# df = pd.read_excel('emotion_and_positivity_predictions.xlsx')
+# df = df[df['topics'] != 'None']
+# df = df[df['predicted_emotion'] != 'neutral']
+# counts = df['President'].value_counts()
+#
+# # Step 2: Get the top 10 presidents with the most rows
+# top_10_presidents = counts.head(10).index
+#
+# # Step 3: Filter the DataFrame to only include those top 10 presidents
+# df_top_10 = df[df['President'].isin(top_10_presidents)]
+# graphs_per_president(df_top_10)

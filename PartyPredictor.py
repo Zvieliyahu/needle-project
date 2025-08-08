@@ -146,7 +146,15 @@ def misclassification_loss(df):
     print('Incorrect predictions: ', incorrect)
     print('Incorrect predictions \ total: ', incorrect / total)
 
-# create_database_vectors(pd.read_excel("combined_predictions.xlsx"))
+create_database_vectors(pd.read_excel("emotion_and_positivity_predictions.xlsx"))
+df = pd.read_csv("Data\cleantext_JoeBiden.tsv", sep="\t")
+filtered_df = df[df['CleanText'].notna() & (df['CleanText'].str.strip() != '')]
+filtered_df['Party'] = 'Democratic'
+filtered_df.to_csv("check_biden.csv")
+filtered_df['predicted_party'] = filtered_df['CleanText'].apply(lambda text: predict_party(text)[0])
+republican_count = (filtered_df['predicted_party'] == 'Republican').sum()
+misclassification_loss(filtered_df)
+filtered_df.to_csv("check_biden.csv")
 # # df = clean_presidential_speeches('Data\presidential_speeches.xlsx')
 # # df = df[df['Party'].isin(['Democratic', 'Republican'])]
 # # df['speech'] = df['speech'].apply(remove_thanking_phrases)
@@ -156,19 +164,19 @@ def misclassification_loss(df):
 #
 # misclassification_loss(df)
 # df.to_excel("prediction_result.xlsx", index=False)
-st.title("Political Party Predictor")
-
-st.write("Enter a political speech or text below to predict whether it aligns more with the **Democratic** or **Republican** party.")
-
-text_input = st.text_area("Input speech text here:", height=200)
-
-if st.button("Predict"):
-    if text_input.strip():
-        with st.spinner("Analyzing..."):
-            party, top_features = predict_party(text_input)
-        st.success(f"Predicted Party: **{party}**")
-        st.markdown("#### Top 5 Most Similar Features:")
-        for feature in top_features:
-            st.write(f"• {feature}")
-    else:
-        st.warning("Please enter some text to analyze.")
+# st.title("Political Party Predictor")
+#
+# st.write("Enter a political speech or text below to predict whether it aligns more with the **Democratic** or **Republican** party.")
+#
+# text_input = st.text_area("Input speech text here:", height=200)
+#
+# if st.button("Predict"):
+#     if text_input.strip():
+#         with st.spinner("Analyzing..."):
+#             party, top_features = predict_party(text_input)
+#         st.success(f"Predicted Party: **{party}**")
+#         st.markdown("#### Top 5 Most Similar Features:")
+#         for feature in top_features:
+#             st.write(f"• {feature}")
+#     else:
+#         st.warning("Please enter some text to analyze.")
