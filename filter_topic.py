@@ -5,7 +5,7 @@ from collections import Counter
 from tqdm import tqdm
 from filter_topic_helper import *
 from cleanData import clean_presidential_speeches
-
+from process_data import remove_thanking_phrases
 
 def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -49,6 +49,7 @@ def assign_positivity_label(speech: str) -> Dict:
     :param speech: the text to which to assign the label
     :return: a dict of label: confidence
     """
+    speech = remove_thanking_phrases(speech)
     words = speech.split()
     chunks = [" ".join(words[i:i + CHUNK_SIZE]) for i in range(0, len(words), CHUNK_SIZE)]
 

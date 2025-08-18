@@ -2,7 +2,6 @@ import pandas as pd
 import spacy
 from collections import Counter
 from tqdm import tqdm
-from transformers import pipeline
 from filter_topic_helper import *
 from process_helper import *
 from process_data import remove_thanking_phrases
@@ -16,6 +15,7 @@ def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
     :return: DataFrame with added 'predicted_emotion' column
     """
     df = df.copy()
+    # print("IN EMOTION CLASSIFICATION !!!!!!!!!!!!!!!!!!!!!!!")
     def get_top_emotion(text):
         doc = nlp(remove_thanking_phrases(text).lower())
 

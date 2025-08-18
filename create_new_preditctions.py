@@ -1,5 +1,6 @@
-from filter_topic import *
+from filter_topic import assign_positivity_label
 from process_data import *
+from final_classify_emotion import classify_emotion
 
 if __name__ == '__main__':
     original_speeches_df = clean_presidential_speeches('Data/presidential_speeches.xlsx')
@@ -15,4 +16,4 @@ if __name__ == '__main__':
 
     topic_speeches_df['topics'] = topic_speeches_df['speech'].apply(classify_topic)
     # Saving filtered data frame
-    topic_speeches_df.to_excel(f"emotion_and_positivity_predictions.xlsx", index=False)
+    topic_speeches_df.to_excel(f"final_data_predictions.xlsx", index=False)

@@ -216,6 +216,27 @@ def graph_party_emotions(df):
     plt.tight_layout()
     plt.savefig("EmotionsVsOnlyDandR.png")
 
+    # Now normalized
+    df_filtered = df[df['Party'].isin(['Democratic', 'Republican'])]
+
+    # Group by party and emotion
+    emotion_party_counts = df_filtered.groupby(['Party', 'predicted_emotion']).size().unstack(fill_value=0)
+
+    # Normalize the counts by party
+    party_totals = emotion_party_counts.sum(axis=1)
+    emotion_party_fractions = emotion_party_counts.div(party_totals, axis=0)
+
+    # Plot the fractions
+    emotion_party_fractions.T.plot(kind='bar', figsize=(12, 6))  # Transpose for emotions on x-axis
+
+    plt.title('Emotion Frequency by Party (Democratic & Republican) - Normalized')
+    plt.xlabel('Emotion')
+    plt.ylabel('Fraction')
+    plt.xticks(rotation=45, ha='right')
+    plt.legend(title='Party')
+    plt.tight_layout()
+    plt.savefig("EmotionsVsOnlyDandR_Normalized.png")
+
     # Precentage for each party
 
     emotion_counts = df_filtered.groupby(['Party', 'predicted_emotion']).size().unstack(fill_value=0)
@@ -491,28 +512,28 @@ def graphs_per_president(df):
         plt.tight_layout()
         plt.savefig(f"{president} emotions.png")
 
-# df = pd.read_excel('speeches_with_topics_different_threshold.xlsx')
+# df = pd.read_excel('final_data_predictions.xlsx')
 # df = df[df['topics'] != 'None']
 # graph_count_topics(df)
 # graph_party_topic(df)
 # graph_time_topics(df)
-# df = pd.read_excel('speeches_with_emotions_final.xlsx')
-# df = pd.read_excel('emotion_and_positivity_predictions.xlsx')
+# # df = pd.read_excel('speeches_with_emotions_final.xlsx')
+# df = pd.read_excel('final_data_predictions.xlsx')
 # df = df[df['predicted_emotion'] != 'neutral']
 # graph_count_emotions(df)
 # graph_party_emotions(df)
 # graph_time_emotions(df)
-# df = pd.read_excel('emotion_and_positivity_predictions.xlsx')
+# df = pd.read_excel('final_data_predictions.xlsx')
 # df = df[df['topics'] != 'None']
 # graphs_per_topic_of_emotions(df)
-# df = pd.read_excel('emotion_and_positivity_predictions.xlsx')
+# df = pd.read_excel('final_data_predictions.xlsx')
 # df = df[df['topics'] != 'None']
 # df = df[df['predicted_emotion'] != 'neutral']
 # counts = df['President'].value_counts()
-#
-# # Step 2: Get the top 10 presidents with the most rows
+# #
+# # # Step 2: Get the top 10 presidents with the most rows
 # top_10_presidents = counts.head(10).index
-#
-# # Step 3: Filter the DataFrame to only include those top 10 presidents
+# #
+# # # Step 3: Filter the DataFrame to only include those top 10 presidents
 # df_top_10 = df[df['President'].isin(top_10_presidents)]
 # graphs_per_president(df_top_10)
