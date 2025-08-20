@@ -15,8 +15,7 @@ def create_presidents_vectors(df):
     df_filtered = add_topic_columns(df_filtered)
     df_filtered = add_emotion_columns(df_filtered)
     df_filtered = add_label_columns(df_filtered)
-    president_mean_vectors = df_filtered.groupby('President')[FEATURE_COLUMNS].mean().reset_index()
-
+    president_mean_vectors = df_filtered.groupby('President')[FEATURE_COLUMNS_3D].mean().reset_index()
     # Extract the Party for each President (assumes each President has one unique Party)
     president_parties = df_filtered[['President', 'Party']].drop_duplicates(subset='President')
 
@@ -141,7 +140,7 @@ def create_presidents_vectors(df):
 ######################################################################################################################
 # Streamlit settings
 st.set_page_config(layout="wide")
-st.title("1D Visualization of U.S. Presidents Based on Topics & Emotions")
+st.title("1D Visualization of U.S. Presidents Based on Topics, Emotions & Sentiments")
 
 # Load data
 df = pd.read_csv("mean_presidents_vectors.csv")
@@ -206,7 +205,7 @@ for party in df_pca['Party'].unique():
 
 # Layout cleanup
 fig.update_layout(
-    title='1D PCA of Presidents: Topics and Emotions by Party',
+    title='1D PCA of Presidents',
     height=700,
     margin=dict(l=0, r=0, t=40, b=0),
     xaxis_title='PC1',
@@ -234,3 +233,13 @@ st.plotly_chart(fig, use_container_width=True)
 # df = df[df['topics'] != 'None']
 # df = df[df['predicted_emotion'] != 'neutral']
 # create_presidents_vectors(df)
+# Apply function to each speech
+# df["__temp_topic_scores__"] = df["speech"].apply(lambda x: extract_topic_sentiment_scores(x, TOPICS_FOR_CLASSIFICATION))
+#
+# # For each topic, create a new column and extract score (default to 0)
+# for topic in TOPICS_FOR_CLASSIFICATION:
+#     column_name = f"{topic.lower()}_sentiment"
+#     df[column_name] = df["__temp_topic_scores__"].apply(lambda d: d.get(topic, 0))
+#
+# # Optional: remove temporary column
+# df.drop(columns=["__temp_topic_scores__"], inplace=True)

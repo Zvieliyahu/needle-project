@@ -85,14 +85,23 @@ def graph_party_topic(df):
     pivot_df_percentage = pivot_df.div(total_speeches_per_party, axis=1) * 100
 
     # Plot grouped bar chart for percentage
-    pivot_df_percentage.plot(kind='bar', figsize=(16, 8))
+    ax = pivot_df_percentage.plot(kind='bar', figsize=(16, 8), color=['red', 'blue'])
 
-    # Customize plot
-    plt.title('Percentage of Speeches by Democrats and Republicans for Each Topic')
-    plt.xlabel('Topic')
-    plt.ylabel('Percentage (%)')
+    # Customize plot title and subtitle
+    plt.title('Percentage of Speeches by Democrats and Republicans for Each Topic', fontsize=16, pad=40)
+    plt.suptitle('Mostly similar, biggest differences in Defense, Economy, Labor and Religion', fontsize=12, y=0.90)  # Subtitle
+
+    # Customize labels
+    plt.xlabel('Topic', fontsize=14)
+    plt.ylabel('Percentage (%)', fontsize=14)
+
+    # Rotate x-ticks and adjust their position
     plt.xticks(rotation=45, ha='right')
-    plt.legend(title='Party')
+
+    # Adjust the legend title and position
+    plt.legend(title='Party', fontsize=12)
+
+    # Adjust layout
     plt.tight_layout()
 
     # Save the plot
@@ -227,14 +236,37 @@ def graph_party_emotions(df):
     emotion_party_fractions = emotion_party_counts.div(party_totals, axis=0)
 
     # Plot the fractions
-    emotion_party_fractions.T.plot(kind='bar', figsize=(12, 6))  # Transpose for emotions on x-axis
+    # emotion_party_fractions.T.plot(kind='bar', figsize=(12, 6))  # Transpose for emotions on x-axis
 
-    plt.title('Emotion Frequency by Party (Democratic & Republican) - Normalized')
-    plt.xlabel('Emotion')
-    plt.ylabel('Fraction')
+    # plt.title('Emotion Frequency by Party (Democratic & Republican) - Normalized')
+    # plt.xlabel('Emotion')
+    # plt.ylabel('Fraction')
+    # plt.xticks(rotation=45, ha='right')
+    # plt.legend(title='Party')
+    # plt.tight_layout()
+    # plt.savefig("EmotionsVsOnlyDandR_Normalized.png")
+
+    ax = emotion_party_fractions.T.plot(kind='bar', figsize=(16, 8), color=['red', 'blue'])
+
+    # Customize plot title and subtitle
+    plt.title('Fraction of Speeches by Democrats and Republicans for Each Emotion', fontsize=16, pad=40)
+    plt.suptitle('Similar values for all emotion (both parties)', fontsize=12,
+                 y=0.90)  # Subtitle
+
+    # Customize labels
+    plt.xlabel('Emotion', fontsize=14)
+    plt.ylabel('Fraction', fontsize=14)
+
+    # Rotate x-ticks and adjust their position
     plt.xticks(rotation=45, ha='right')
-    plt.legend(title='Party')
+
+    # Adjust the legend title and position
+    plt.legend(title='Party', fontsize=12)
+
+    # Adjust layout
     plt.tight_layout()
+
+    # Save the plot
     plt.savefig("EmotionsVsOnlyDandR_Normalized.png")
 
     # Precentage for each party

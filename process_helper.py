@@ -143,4 +143,6 @@ EMOTIONS = ['anger', 'fear', 'sadness', 'joy']
 LABELS = ['NEGATIVE', 'NEUTRAL', 'POSITIVE']
 TOPICS = list(TOPICS_FOR_CLASSIFICATION.keys())
 TOPICS = [topic.lower() for topic in TOPICS]
-FEATURE_COLUMNS = TOPICS + EMOTIONS + LABELS #+ ['positivity_score']  # All binary columns
+sentiment_columns = [f"{topic}_sentiment" for topic in TOPICS]
+FEATURE_COLUMNS = TOPICS + EMOTIONS + LABELS + sentiment_columns
+FEATURE_COLUMNS_3D = TOPICS + EMOTIONS + LABELS #+ ['positivity_score']  # All binary columns

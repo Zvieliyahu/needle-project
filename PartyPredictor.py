@@ -14,17 +14,20 @@ df_party = pd.read_csv('party_vectors.csv')
 
 # Get clean data output vectors that represents each party
 def create_database_vectors(df : pd.DataFrame):
-    N_CLUSTERS = 70
+    N_CLUSTERS = 10
 
-    df_filtered = df[df['Party'].isin(['Democratic', 'Republican'])].copy()
-
-    df_filtered = add_topic_columns(df_filtered)
-    df_filtered = add_emotion_columns(df_filtered)
-    df_filtered = add_label_columns(df_filtered)
-
-    df_filtered.to_excel('database_vectors.xlsx', index=False)
+    # df_filtered = df[df['Party'].isin(['Democratic', 'Republican'])].copy()
+    #
+    # df_filtered = add_topic_columns(df_filtered)
+    # df_filtered = add_emotion_columns(df_filtered)
+    # df_filtered = add_label_columns(df_filtered)
+    # df_filtered = add_topic_sentiment_scores(df_filtered)
+    #
+    # df_filtered.to_excel('database_vectors.xlsx', index=False)
+    df_filtered = pd.read_excel('database_vectors.xlsx')
     # Compute mean vectors by party
     party_mean_vectors = df_filtered.groupby('Party')[FEATURE_COLUMNS].mean().reset_index()
+    # add Feature
     party_mean_vectors['Cluster'] = 'Mean'  # Mark these rows as mean vectors
 
     def compute_party_clusters(df_party, party_name):
@@ -32,7 +35,7 @@ def create_database_vectors(df : pd.DataFrame):
         if len(vectors) < N_CLUSTERS:
             raise ValueError(f"Not enough speeches for {party_name} to form {N_CLUSTERS} clusters.")
 
-        kmeans = KMeans(n_clusters=N_CLUSTERS, random_state=42)
+        kmeans = KMeans(n_clusters=N_CLUSTERS, random_state=92)
         kmeans.fit(vectors)
 
         cluster_centers = pd.DataFrame(kmeans.cluster_centers_, columns=FEATURE_COLUMNS)
@@ -117,10 +120,14 @@ def predict_party(text : str):
     df = add_emotion_columns(df)
     # label & positivity
     df = add_label_columns(df)
+    # topic sentiment
+    df = add_topic_sentiment_scores(df)
     input_vector = df[FEATURE_COLUMNS]
+
+    # return input_vector.values.flatten()
     #print(input_vector.head())
     # Calc the similarty from the csv
-
+###########################################################################
     csv_vectors = df_party[FEATURE_COLUMNS].values
 
     # Step 4: Convert your input vector to correct shape
@@ -143,10 +150,6 @@ def predict_party(text : str):
     # Get top 5 closest feature names
     top_features_idx = differences.argsort()[:5]
     top_features = [FEATURE_COLUMNS[i] for i in top_features_idx]
-
-    count += 1
-    if count % 40 == 0:
-        print(count)
 
     return most_similar_row["Party"], top_features
 
@@ -195,47 +198,65 @@ def misclassification_loss(df):
     print('Incorrect predictions: ', incorrect)
     print('Incorrect predictions \ total: ', incorrect / total)
 
-create_database_vectors(pd.read_excel("final_data_predictions.xlsx"))
-df = pd.read_csv("Data\cleantext_JoeBiden.tsv", sep="\t")
-biden_filtered_df = df[['CleanText', 'Date']]
-biden_filtered_df = biden_filtered_df[biden_filtered_df['CleanText'].notna() & (biden_filtered_df['CleanText'].str.strip() != '')]
-biden_filtered_df['Party'] = 'Democratic'
-biden_filtered_df.to_csv("check_biden.csv")
+# create_database_vectors(pd.read_excel("final_data_predictions.xlsx"))
+# df = pd.read_csv("Data\cleantext_JoeBiden.tsv", sep="\t")
+# biden_filtered_df = df[['CleanText', 'Date']]
+# biden_filtered_df = biden_filtered_df[biden_filtered_df['CleanText'].notna() & (biden_filtered_df['CleanText'].str.strip() != '')]
+# biden_filtered_df['Party'] = 'Democratic'
 # df = pd.read_csv("Data\cleantext_DonaldTrump.tsv", sep="\t")
 # trump_filtered_df = df[df['SpeechID'].str.startswith('CSPAN', na=False)]
 # trump_filtered_df = trump_filtered_df[['CleanText', 'Date']]
 # trump_filtered_df = trump_filtered_df[trump_filtered_df['CleanText'].notna() & (trump_filtered_df['CleanText'].str.strip() != '')]
 # trump_filtered_df['Party'] = 'Republican'
-# trump_filtered_df.to_excel("check_trump.xlsx")
-biden_filtered_df['predicted_party'] = biden_filtered_df['CleanText'].apply(lambda text: predict_party(text)[0])
-# # republican_count = (filtered_df['predicted_party'] == 'Republican').sum()
-# trump_filtered_df['predicted_party'] = trump_filtered_df['CleanText'].apply(lambda text: predict_party(text)[0])
+# # trump_filtered_df.to_excel("check_trump.xlsx")
+# expanded_features_df_biden = biden_filtered_df['CleanText'].apply(
+#     lambda text: predict_party(text)
+# )  # Store Biden features in a separate variable
+# expanded_features_df_biden = expanded_features_df_biden.apply(pd.Series)
+# expanded_features_df_biden.columns = FEATURE_COLUMNS
+# biden_filtered_df = pd.concat([biden_filtered_df, expanded_features_df_biden], axis=1)
+# biden_filtered_df.to_csv("check_biden.csv")
+# ############################################################################
+# # biden_filtered_df['predicted_party'] = biden_filtered_df['CleanText'].apply(lambda text: predict_party(text)[0])
+# # # republican_count = (filtered_df['predicted_party'] == 'Republican').sum()
+# # trump_filtered_df['predicted_party'] = trump_filtered_df['CleanText'].apply(lambda text: predict_party(text)[0])
+# ###########################################################################
+# expanded_features_df_trump = trump_filtered_df['CleanText'].apply(
+#     lambda text: predict_party(text)
+# )  # Store Trump features in a separate variable
+# expanded_features_df_trump = expanded_features_df_trump.apply(pd.Series)
+# expanded_features_df_trump.columns = FEATURE_COLUMNS
+# trump_filtered_df = pd.concat([trump_filtered_df, expanded_features_df_trump], axis=1)
+# # Combine the expanded features with the original trump_filtered_df
+# # trump_filtered_df = pd.concat([trump_filtered_df, expanded_features_df_trump], axis=1)
 # filtered_df = pd.concat([biden_filtered_df, trump_filtered_df], ignore_index=True)
 # filtered_df.to_excel("check_all.xlsx")
-misclassification_loss(biden_filtered_df)
-biden_filtered_df.to_excel("check_biden_and_trump.xlsx")
+# misclassification_loss(filtered_df)
+# filtered_df.to_excel("check_biden_and_trump.xlsx")
 # # df = clean_presidential_speeches('Data\presidential_speeches.xlsx')
 # # df = df[df['Party'].isin(['Democratic', 'Republican'])]
 # # df['speech'] = df['speech'].apply(remove_thanking_phrases)
-# df = pd.read_excel("database_vectors.xlsx")
-# # df['predicted_party'] = df['speech'].head(50).apply(predict_party)
+# df = pd.read_excel("check_all.xlsx")
+# # # df['predicted_party'] = df['speech'].head(50).apply(predict_party)
 # df['predicted_party'] = df.apply(test_loss, axis=1)
-#
+# #
 # misclassification_loss(df)
+# df.to_excel("check_biden_and_trump.xlsx")
+
 # df.to_excel("prediction_result.xlsx", index=False)
-# st.title("Political Party Predictor")
+st.title("Political Party Predictor")
 #
-# st.write("Enter a political speech or text below to predict whether it aligns more with the **Democratic** or **Republican** party.")
-#
-# text_input = st.text_area("Input speech text here:", height=200)
-#
-# if st.button("Predict"):
-#     if text_input.strip():
-#         with st.spinner("Analyzing..."):
-#             party, top_features = predict_party(text_input)
-#         st.success(f"Predicted Party: **{party}**")
-#         st.markdown("#### Top 5 Most Similar Features:")
-#         for feature in top_features:
-#             st.write(f"• {feature}")
-#     else:
-#         st.warning("Please enter some text to analyze.")
+st.write("Enter a political speech or text below to predict whether it aligns more with the **Democratic** or **Republican** party.")
+
+text_input = st.text_area("Input speech text here:", height=200)
+
+if st.button("Predict"):
+    if text_input.strip():
+        with st.spinner("Analyzing..."):
+            party, top_features = predict_party(text_input)
+        st.success(f"Predicted Party: **{party}**")
+        st.markdown("#### Top 5 Most Similar Features:")
+        for feature in top_features:
+            st.write(f"• {feature}")
+    else:
+        st.warning("Please enter some text to analyze.")
