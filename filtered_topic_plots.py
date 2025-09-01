@@ -5,6 +5,10 @@ from wordcloud import WordCloud
 from nltk.corpus import stopwords
 import spacy
 from process_helper import UNRELATED_TOPIC_WORDS, ALLOWED_POS
+import re
+import numpy as np
+import joblib
+import os
 
 
 def plot_bar_by_century(df: pd.DataFrame):
@@ -132,10 +136,21 @@ def clean_text(text):
     return ' '.join(tokens)
 
 
-def plot_word_cloud(df: pd.DataFrame):
-    all_speeches = clean_text(" ".join(df['speech'].dropna().astype(str).tolist()))
+def plot_word_cloud(df: pd.DataFrame, start_year=None, end_year=None, output_path=None, date_column='date'):
+    # Ensure 'date' is datetime
+    df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
 
-    # Create the word cloud object
+    # Filter by year range if specified
+    if start_year is not None:
+        df = df[df[date_column].dt.year >= start_year]
+    if end_year is not None:
+        df = df[df[date_column].dt.year <= end_year]
+
+    # Combine and clean all speeches
+    all_speeches = " ".join(df['speech'].dropna().astype(str).tolist())
+    all_speeches = re.sub(r'[^\w\s]', '', all_speeches)  # Remove punctuation
+
+    # Create the word cloud
     wordcloud = WordCloud(
         width=800,
         height=400,
@@ -147,46 +162,89 @@ def plot_word_cloud(df: pd.DataFrame):
     plt.figure(figsize=(15, 7.5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')
-    plt.title('Word Cloud of All Speeches Combined', fontsize=20)
+    title = f'Word Cloud of Speeches ({start_year}–{end_year})' if start_year or end_year else 'Word Cloud of All Speeches Combined'
+    plt.title(title, fontsize=20)
+    if output_path:
+        plt.savefig(output_path, bbox_inches='tight')
     plt.show()
 
 
-def plot_tfidf_word_cloud(df: pd.DataFrame, full_speeches_df: pd.DataFrame, text_column='speech'):
-    # Combine speeches into documents
-    target_docs = df[text_column].dropna().astype(str).tolist()
-    background_docs = full_speeches_df[text_column].dropna().astype(str).tolist()
+# Load spaCy English model once
+nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
 
-    # Prepare corpus: target + background
+
+def plot_tfidf_word_cloud(df: pd.DataFrame,
+                          full_speeches_df: pd.DataFrame,
+                          text_column='speech',
+                          date_column='date',
+                          start_year=None,
+                          end_year=None,
+                          output_path=None,
+                          lemmatize=False,
+                          lemmatized_background_path=None):  # <-- New parameter
+
+    def remove_punctuation(text):
+        return re.sub(r'[^\w\s]', '', text)
+
+    def lemmatize_texts(texts):
+        lemmatized = []
+        for doc in nlp.pipe(texts, batch_size=1000):
+            tokens = [token.lemma_.lower() for token in doc if token.is_alpha and not token.is_stop]
+            lemmatized.append(" ".join(tokens))
+        return lemmatized
+
+    # Convert date columns
+    df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
+    full_speeches_df[date_column] = pd.to_datetime(full_speeches_df[date_column], errors='coerce')
+
+    # Filter target df
+    if start_year is not None:
+        df = df[df[date_column].dt.year >= start_year]
+    if end_year is not None:
+        df = df[df[date_column].dt.year <= end_year]
+
+    # Prepare texts
+    target_docs = df[text_column].dropna().astype(str).apply(remove_punctuation).tolist()
+    background_raw = full_speeches_df[text_column].dropna().astype(str).apply(remove_punctuation).tolist()
+
+    # Optional lemmatization
+    if lemmatize:
+        target_docs = lemmatize_texts(target_docs)
+
+        # Load or compute cached background
+        if lemmatized_background_path and os.path.exists(lemmatized_background_path):
+            background_docs = joblib.load(lemmatized_background_path)
+            print(f"Loaded lemmatized background from: {lemmatized_background_path}")
+        else:
+            background_docs = lemmatize_texts(background_raw)
+            if lemmatized_background_path:
+                joblib.dump(background_docs, lemmatized_background_path)
+                print(f"Saved lemmatized background to: {lemmatized_background_path}")
+    else:
+        background_docs = background_raw
+
+    # Combine corpora
     corpus = target_docs + background_docs
-
-    # Create labels to identify which docs belong to target
     n_target = len(target_docs)
 
-    # Initialize TF-IDF Vectorizer
+    # TF-IDF
     vectorizer = TfidfVectorizer(stop_words='english', max_features=5000)
-
-    # Fit and transform corpus
     tfidf_matrix = vectorizer.fit_transform(corpus)
 
-    # Separate TF-IDF for target docs and background docs
+    # Split matrices
     target_tfidf = tfidf_matrix[:n_target]
     background_tfidf = tfidf_matrix[n_target:]
 
-    # Average TF-IDF scores for each term in target and background
-    import numpy as np
+    # Mean TF-IDF
     target_mean = np.asarray(target_tfidf.mean(axis=0)).ravel()
     background_mean = np.asarray(background_tfidf.mean(axis=0)).ravel()
 
-    # Calculate "uniqueness" score: target_mean minus background_mean (or ratio)
-    uniqueness = target_mean - background_mean  # could also do target_mean / (background_mean + 1e-9)
-
-    # Get feature names (words)
+    # Compute uniqueness
+    uniqueness = target_mean - background_mean
     feature_names = vectorizer.get_feature_names_out()
-
-    # Create dictionary of words and uniqueness scores (only positive scores)
     unique_words = {word: score for word, score in zip(feature_names, uniqueness) if score > 0}
 
-    # Generate word cloud weighted by uniqueness score
+    # Word cloud
     wordcloud = WordCloud(
         width=800,
         height=400,
@@ -194,30 +252,35 @@ def plot_tfidf_word_cloud(df: pd.DataFrame, full_speeches_df: pd.DataFrame, text
         max_words=50
     ).generate_from_frequencies(unique_words)
 
-    # Plot the word cloud
+    # Plot
     plt.figure(figsize=(15, 7.5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')
-    plt.title('TF-IDF Weighted Word Cloud of Unique Words', fontsize=20)
+    title = f'TF-IDF Weighted Word Cloud ({start_year}–{end_year})' if start_year or end_year else 'TF-IDF Weighted Word Cloud'
+    plt.title(title, fontsize=20)
+    if output_path:
+        plt.savefig(output_path, bbox_inches='tight')
     plt.show()
-    plt.savefig("immigration/tf_idf_speeches")
 
 
 PATH_IMMIGRATION = 'immigration/cutted_speeches_that_include_immigration_keywords.xlsx'
 PATH_BLACK_RIGHTS = 'black rights/cutted_speeches_that_include_black_rights_keywords.xlsx'
 PATH_WOMEN_RIGHTS = 'women rights/cutted_speeches_that_include_womens_rights_keywords.xlsx'
 PATH_NATIVE_AMERICANS = 'native americans/cutted_speeches_that_include_native_americans_keywords.xlsx'
+PATH_WAR = 'war/cutted_speeches_that_include_war_keywords.xlsx'
 PATH_ORIGINAL_SPEECHES = 'Data/presidential_speeches.xlsx'
-TOPIC = "native_americans"
+TOPIC = "war"
 
 
 def run_plots(path):
-    plot_bar_by_century(pd.read_excel(path))
-    plot_bar_by_party_and_positivity(pd.read_excel(path))
-    plot_party_speeches_by_decade(pd.read_excel(path))
-    plot_word_cloud(pd.read_excel(path))
-    plot_tfidf_word_cloud(pd.read_excel(path), pd.read_excel(PATH_ORIGINAL_SPEECHES))
+    # plot_bar_by_century(pd.read_excel(path))
+    # plot_bar_by_party_and_positivity(pd.read_excel(path))
+    # plot_party_speeches_by_decade(pd.read_excel(path))
+    plot_tfidf_word_cloud(pd.read_excel(path), pd.read_excel(PATH_ORIGINAL_SPEECHES), start_year=1930, end_year=1950,
+                          output_path=f"war/ww2_lemmatized.png", lemmatize=True,
+                          lemmatized_background_path="Data/lemmatized_speeches.pkl")
+    # plot_word_cloud(pd.read_excel(path), start_year=1850, end_year=1870, output_path=f"black rights/1860_general.png")
 
 
 if __name__ == '__main__':
-    run_plots(PATH_NATIVE_AMERICANS)
+    run_plots(PATH_WAR)

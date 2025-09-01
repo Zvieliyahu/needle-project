@@ -12,6 +12,13 @@ LABEL_MAP = {
 MIN_APPEARANCES = 8
 FILE_PATH = 'Data/presidential_speeches.xlsx'
 
+# Default paths:
+PATH_IMMIGRATION = 'immigration/cutted_speeches_that_include_immigration_keywords.xlsx'
+PATH_BLACK_RIGHTS = 'black rights/cutted_speeches_that_include_black_rights_keywords.xlsx'
+PATH_WOMEN_RIGHTS = 'women rights/cutted_speeches_that_include_womens_rights_keywords.xlsx'
+PATH_NATIVE_AMERICANS = 'native americans/cutted_speeches_that_include_native_americans_keywords.xlsx'
+PATH_WAR = 'war/cutted_speeches_that_include_war_keywords.xlsx'
+
 ##################
 ## CLASSIFIERS: ##
 ##################
@@ -211,4 +218,55 @@ MOST_IMPORTANT_KEYWORDS_NATIVE_AMERICANS = [
     "native american unemployment", "native american education", "native american healthcare",
     "pipeline protests", "dakota access pipeline", "environmental justice"
 ]
+
+"""
+                                   ##########
+                                   ## Wars ##
+                                   ##########
+"""
+DIRECTORY_WAR = 'war/'
+WAR_KEYWORDS = [
+    # General war and military terms
+    "war", "wars", "military", "armed forces", "soldier", "soldiers", "battle", "battles", "conflict", "conflicts",
+    "enemy", "enemies", "troops", "army", "navy", "air force", "marines", "combat", "hostilities", "violence",
+    "defend", "defense", "defending", "security", "invasion", "occupation", "resistance", "aggression", "force",
+    "veterans", "fallen heroes", "sacrifice", "service members", "wounded", "warriors", "servicemen", "military families",
+    "commander in chief", "military operation", "military campaign", "military intervention", "armed conflict",
+    "peace talks", "ceasefire", "truce", "diplomatic effort", "peacekeeping", "withdrawal", "occupation",
+    "national security", "homeland security", "preparedness", "mobilization", "deployment", "readiness",
+    "insurrection", "rebellion", "blockade", "bombardment", "gunfire", "artillery", "regiment", "brigade", "militia",
+
+    # Broad terrorism-related language
+    "terrorism", "terrorist", "terrorists", "terror threats", "threat of terror", "threats to our security",
+    "global terrorism", "violent extremism", "extremist", "extremists", "radical ideology",
+    "terror attacks", "terror cells", "domestic terrorism", "foreign terrorism",
+
+    # Specific wars
+    "revolutionary war", "civil war", "world war one", "world war two", "first world war", "second world war",
+    "korean war", "vietnam war", "iraq war", "afghanistan war", "gulf war", "cold war", "war on terror",
+
+    # Specific terror-related events or military operations
+    "september eleventh", "911 attacks", "terrorist attacks", "al qaeda", "osama bin laden", "isis", "islamic state",
+    "taliban", "homeland security act", "patriot act", "guantanamo", "enemy combatants", "operation enduring freedom",
+    "operation iraqi freedom", "drone strikes", "counterterrorism operations", "counterinsurgency",
+    "terrorist network", "war on terrorism", "axis of evil", "troop surge", "military escalation", "foreign fighters",
+
+    # Authorization and legal context
+    "authorized use of military force", "aumf", "war powers", "military tribunals", "extraordinary rendition",
+
+    # Terror prevention and domestic policy
+    "domestic terror threat", "radicalization", "preventing terrorism", "terror financing",
+    "counterterrorism strategy", "lone wolf attacks", "security clearance", "terror watch list"
+]
+
+MOST_IMPORTANT_KEYWORDS_WAR = [
+    "war", "military conflict", "armed conflict", "battle", "combat", "troops", "invasion", "enemy",
+    "hostilities", "military action", "declared war", "declaration of war", "military force", "warfare",
+    "combat mission", "battlefield", "armed forces", "national defense", "enemy forces", "troop deployment",
+    "military campaign", "terrorism", "terrorist", "terrorists", "war on terror", "counterterrorism",
+    "terrorist attacks", "september eleventh", "911 attacks", "al qaeda", "isis", "islamic state",
+    "homeland security"
+]
+
+
 

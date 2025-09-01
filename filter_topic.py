@@ -7,6 +7,7 @@ from filter_topic_helper import *
 from cleanData import clean_presidential_speeches
 from process_data import remove_thanking_phrases
 
+
 def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
     """
     Classifying each speech with emotion using chunking.
@@ -22,6 +23,7 @@ def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
 
             emotion_labels = []
 
+            # Reading speeches by chunks and feed them to the classifier
             for chunk in chunks:
                 result = emotion_classifier(chunk, truncation=True)
                 label = result[0][0]['label'] if result else "neutral"
@@ -56,6 +58,7 @@ def assign_positivity_label(speech: str) -> Dict:
     labels = []
     scores = []
 
+    # Reading speeches by chunks and feed them to the classifier
     for chunk in chunks:
         result_list = sentiment_pipeline(chunk, truncation=True)  # Always returns a list
         result = result_list[0][0]
@@ -63,6 +66,7 @@ def assign_positivity_label(speech: str) -> Dict:
         label = LABEL_MAP[raw_label]
         score = result["score"]
 
+        # If not that confident in neutral choosing to assign positive/negative labels
         if label == "neutral" and score < 0.6 and result_list[0][1]["score"] > 0.3:
             label = LABEL_MAP[result_list[0][1]["label"]]
             score = result_list[0][1]["score"]
@@ -189,10 +193,6 @@ def find_speeches_with_keywords(file_path: str, keywords: List[str], important_k
     topic_speeches_df = speeches_df[speeches_df[f'contains_{topic}_keywords'] == True]
     topic_speeches_df.to_excel(f"{directory}whole_speeches_that_include_{topic}_keywords.xlsx", index=False)
 
-    # Filtering original speeches
-    # original_speeches_df = pd.read_excel('Data/presidential_speeches.xlsx')
-    # filtered_original_df = original_speeches_df.loc[topic_speeches_df.index]
-
     # Cutting speech for relevant part only
     topic_speeches_df['speech'] = topic_speeches_df['speech'].apply(
         lambda x: cut_speech(x, important_keywords, num_of_extra_words=60)
@@ -212,14 +212,3 @@ def find_speeches_with_keywords(file_path: str, keywords: List[str], important_k
     # Saving filtered data frame
     topic_speeches_df.to_excel(f"{directory}cutted_speeches_that_include_{topic}_keywords.xlsx", index=False)
     return topic_speeches_df.copy()
-
-
-if __name__ == '__main__':
-    # find_speeches_with_keywords(FILE_PATH_IMMIGRATION, IMMIGRATION_KEYWORDS, MOST_IMPORTANT_KEYWORDS_IMMIGRATION,
-    #                             MIN_APPEARANCES, DIRECTORY_IMMIGRATION, "immigration")
-    # find_speeches_with_keywords(FILE_PATH_BLACK_RIGHTS, BLACK_RIGHTS_KEYWORD, MOST_IMPORTANT_BLACK_RIGHTS_KEYWORDS,
-    #                             MIN_APPEARANCES, DIRECTORY_BLACK_RIGHTS, "black_rights")
-    # find_speeches_with_keywords(FILE_PATH, WOMEN_RIGHTS_KEYWORDS, MOST_IMPORTANT_KEYWORDS_WOMEN_RIGHTS,
-    #                             MIN_APPEARANCES, DIRECTORY_WOMEN_RIGHTS, "womens_rights")
-    find_speeches_with_keywords(FILE_PATH, NATIVE_AMERICANS_KEYWORDS, MOST_IMPORTANT_KEYWORDS_NATIVE_AMERICANS,
-                                MIN_APPEARANCES, DIRECTORY_NATIVE_AMERICANS, "native_americans")
