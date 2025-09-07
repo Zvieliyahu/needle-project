@@ -87,8 +87,7 @@ class TimeAnalyzer:
 
         # Filter only relevant speeches
         df = df[df['period'] != "other"]
-        # TODO: Change positivity score to confidence
-        contingency = pd.crosstab(df['period'], df['positivity_score'])
+        contingency = pd.crosstab(df['period'], df['confidence'])
         chi2, p, dof, ex = chi2_contingency(contingency)
 
         print("\n######################################################################\n")
@@ -330,9 +329,9 @@ class TimeAnalyzer:
         self.print_stats()
 
 
-if __name__ == '__main__':
-    time_analyzer = TimeAnalyzer(classify_speeches=False)
-    time_analyzer.compare_wars()
+# if __name__ == '__main__':
+#     time_analyzer = TimeAnalyzer(classify_speeches=False)
+#     time_analyzer.compare_wars()
     # time_analyzer.get_emotion_stats_black_rights()
     # time_analyzer.print_stats()
     # time_analyzer.plot_war_and_peace_terminology_use()

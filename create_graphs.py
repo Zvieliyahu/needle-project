@@ -24,6 +24,7 @@ def graph_count_topics(df):
 # create graph of topics vs party
 def graph_party_topic(df):
     # Explode topics (split comma, strip)
+    # *********************** final? parts needed ******************************
     df_expanded = df.assign(topic=df['topics'].str.split(',')).explode('topic')
     df_expanded['topic'] = df_expanded['topic'].str.strip()
 
@@ -69,7 +70,7 @@ def graph_party_topic(df):
     plt.legend(title='Party')
     plt.tight_layout()
     plt.savefig("TopicCountsByOnlyRandDPartys.png")
-
+    # ****************************************** final ************************************
     df_expanded = df_expanded[df_expanded['Party'].isin(['Republican', 'Democratic'])]
 
     # Group by party and topic, count occurrences
@@ -192,6 +193,7 @@ def graph_count_emotions(df):
 
 # create graph of emotions vs party
 def graph_party_emotions(df):
+    # **************************** final? parts needed *******************************
     df['predicted_emotion'] = df['predicted_emotion'].str.strip().str.lower()
     df['Party'] = df['Party'].str.strip()
 
@@ -225,6 +227,7 @@ def graph_party_emotions(df):
     plt.tight_layout()
     plt.savefig("EmotionsVsOnlyDandR.png")
 
+    # ************************************* final *********************************
     # Now normalized
     df_filtered = df[df['Party'].isin(['Democratic', 'Republican'])]
 
@@ -278,10 +281,11 @@ def graph_party_emotions(df):
 
     yticks = np.arange(0, 1.1, 0.1)
     # Plot for Democratic
-    plt.figure(figsize=(8, 5))
-    emotion_percentages.loc['Democratic'].plot(kind='bar', color='skyblue')
-    plt.title('Emotion Distribution - Democratic (Normalized)')
-    plt.ylabel('Proportion (0 to 1)')
+    plt.figure(figsize=(16, 8))
+    emotion_percentages.loc['Democratic'].plot(kind='bar', color='blue')
+    plt.title('Emotion Distribution - Democratic (Normalized)', fontsize=16, pad=40)
+    plt.suptitle('Positive emotion leading (joy), followed by mostly negative emotions (anger, etc\')', fontsize=12, y=0.90)
+    plt.ylabel('Fraction')
     plt.xlabel('Emotion')
     plt.yticks(yticks)
     plt.ylim(0, 1)
@@ -290,10 +294,11 @@ def graph_party_emotions(df):
     plt.savefig("DemocraticEmotionDistribution.png")
 
     # Plot for Republican
-    plt.figure(figsize=(8, 5))
-    emotion_percentages.loc['Republican'].plot(kind='bar', color='salmon')
-    plt.title('Emotion Distribution - Republican (Normalized)')
-    plt.ylabel('Proportion (0 to 1)')
+    plt.figure(figsize=(16, 8))
+    emotion_percentages.loc['Republican'].plot(kind='bar', color='red')
+    plt.title('Emotion Distribution - Republican (Normalized)', fontsize=16, pad=40)
+    plt.suptitle('Positive emotion leading (joy), followed by mostly negative emotions (anger, etc\')', fontsize=12, y=0.90)
+    plt.ylabel('Fraction')
     plt.xlabel('Emotion')
     plt.yticks(yticks)
     plt.ylim(0, 1)
@@ -544,16 +549,17 @@ def graphs_per_president(df):
         plt.tight_layout()
         plt.savefig(f"{president} emotions.png")
 
+# *************************************** final parts needed ************************
 # df = pd.read_excel('final_data_predictions.xlsx')
 # df = df[df['topics'] != 'None']
 # graph_count_topics(df)
 # graph_party_topic(df)
 # graph_time_topics(df)
 # # df = pd.read_excel('speeches_with_emotions_final.xlsx')
-# df = pd.read_excel('final_data_predictions.xlsx')
-# df = df[df['predicted_emotion'] != 'neutral']
+df = pd.read_excel('final_data_predictions.xlsx')
+df = df[df['predicted_emotion'] != 'neutral']
 # graph_count_emotions(df)
-# graph_party_emotions(df)
+graph_party_emotions(df)
 # graph_time_emotions(df)
 # df = pd.read_excel('final_data_predictions.xlsx')
 # df = df[df['topics'] != 'None']

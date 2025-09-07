@@ -21,8 +21,8 @@ def create_presidents_vectors(df):
 
     # Merge Party info back into the mean vectors
     president_mean_vectors = president_mean_vectors.merge(president_parties, on='President', how='left')
-    pd.set_option("display.max_columns", None)
-    print(president_mean_vectors.head())
+    # pd.set_option("display.max_columns", None)
+    # print(president_mean_vectors.head())
     president_mean_vectors.to_csv("mean_presidents_vectors.csv", index=False)
 
 ###############################################################################################################
@@ -139,85 +139,87 @@ def create_presidents_vectors(df):
 
 ######################################################################################################################
 # Streamlit settings
-st.set_page_config(layout="wide")
-st.title("1D Visualization of U.S. Presidents Based on Topics, Emotions & Sentiments")
-
-# Load data
-df = pd.read_csv("mean_presidents_vectors.csv")
-df = df[df['Party'].isin(['Democratic', 'Republican'])]
-
-# Features
-features = df.drop(columns=['President', 'Party'])
-presidents = df['President']
-parties = df['Party']
-
-# Standardize
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(features)
-
-# PCA to 1D
-pca = PCA(n_components=1)
-pca_result = pca.fit_transform(X_scaled)
-
-# PCA dataframe
-df_pca = pd.DataFrame(data=pca_result * -1, columns=['PC1'])  # Reverse axis
-df_pca['President'] = presidents
-df_pca['Party'] = parties
-
-# Add stats (original features)
-df_pca = pd.concat([df_pca, features.reset_index(drop=True)], axis=1)
-
-# Sort by PC1 for correct left-right ordering
-df_pca = df_pca.sort_values(by='PC1').reset_index(drop=True)
-
-# y=0 for all dots
-df_pca['y'] = 0
-
-# Alternate label positions
-text_positions = ['top center' if i % 2 == 0 else 'bottom center' for i in range(len(df_pca))]
-for i, name in enumerate(df_pca['President']):
-    if 'George W. Bush' in name:
-        text_positions[i] = 'bottom center'
-
-# Party color map
-party_colors = {
-    'Democratic': 'blue',
-    'Republican': 'red',
-}
-
-# Create plot
-fig = go.Figure()
-
-# Add points grouped by party for legend
-for party in df_pca['Party'].unique():
-    df_party = df_pca[df_pca['Party'] == party]
-
-    fig.add_trace(go.Scatter(
-        x=df_party['PC1'],
-        y=df_party['y'],
-        mode='markers+text',
-        name=party,
-        marker=dict(size=10, color=party_colors[party]),
-        text=df_party['President'],
-        textposition=[text_positions[i] for i in df_party.index],
-        textfont=dict(size=12),
-    ))
-
-# Layout cleanup
-fig.update_layout(
-    title='1D PCA of Presidents',
-    height=700,
-    margin=dict(l=0, r=0, t=40, b=0),
-    xaxis_title='PC1',
-    yaxis=dict(visible=False),
-    legend=dict(title='Party'),
-)
-
-# Display
-st.plotly_chart(fig, use_container_width=True)
+# ****************************************** final ***********************************
+# st.set_page_config(layout="wide")
+# st.title("1D Visualization of U.S. Presidents Based on Topics, Emotions & Sentiments")
+#
+# # Load data
+# df = pd.read_csv("mean_presidents_vectors.csv")
+# df = df[df['Party'].isin(['Democratic', 'Republican'])]
+#
+# # Features
+# features = df.drop(columns=['President', 'Party'])
+# presidents = df['President']
+# parties = df['Party']
+#
+# # Standardize
+# scaler = StandardScaler()
+# X_scaled = scaler.fit_transform(features)
+#
+# # PCA to 1D
+# pca = PCA(n_components=1)
+# pca_result = pca.fit_transform(X_scaled)
+#
+# # PCA dataframe
+# df_pca = pd.DataFrame(data=pca_result * -1, columns=['PC1'])  # Reverse axis
+# df_pca['President'] = presidents
+# df_pca['Party'] = parties
+#
+# # Add stats (original features)
+# df_pca = pd.concat([df_pca, features.reset_index(drop=True)], axis=1)
+#
+# # Sort by PC1 for correct left-right ordering
+# df_pca = df_pca.sort_values(by='PC1').reset_index(drop=True)
+#
+# # y=0 for all dots
+# df_pca['y'] = 0
+#
+# # Alternate label positions
+# text_positions = ['top center' if i % 2 == 0 else 'bottom center' for i in range(len(df_pca))]
+# for i, name in enumerate(df_pca['President']):
+#     if 'George W. Bush' in name:
+#         text_positions[i] = 'bottom center'
+#
+# # Party color map
+# party_colors = {
+#     'Democratic': 'blue',
+#     'Republican': 'red',
+# }
+#
+# # Create plot
+# fig = go.Figure()
+#
+# # Add points grouped by party for legend
+# for party in df_pca['Party'].unique():
+#     df_party = df_pca[df_pca['Party'] == party]
+#
+#     fig.add_trace(go.Scatter(
+#         x=df_party['PC1'],
+#         y=df_party['y'],
+#         mode='markers+text',
+#         name=party,
+#         marker=dict(size=10, color=party_colors[party]),
+#         text=df_party['President'],
+#         textposition=[text_positions[i] for i in df_party.index],
+#         textfont=dict(size=12),
+#     ))
+#
+# # Layout cleanup
+# fig.update_layout(
+#     title='1D PCA of Presidents',
+#     height=700,
+#     margin=dict(l=0, r=0, t=40, b=0),
+#     xaxis_title='PC1',
+#     yaxis=dict(visible=False),
+#     legend=dict(title='Party'),
+# )
+#
+# # Display
+# st.plotly_chart(fig, use_container_width=True)
 
 
 ########################################################################################################################
+# *************************************************** final ************************************
 # Preparation
 # df = pd.read_excel('final_data_predictions.xlsx')
 # df_filtered_parties = df[df['Party'].isin(['Democratic', 'Republican'])]
@@ -230,10 +232,10 @@ st.plotly_chart(fig, use_container_width=True)
 #
 # # Step 4: Filter the DataFrame to keep only those presidents
 # df = df_filtered_parties[df_filtered_parties['President'].isin(top_10_presidents)]
-# df = df[df['topics'] != 'None']
-# df = df[df['predicted_emotion'] != 'neutral']
+# # df = df[df['topics'] != 'None']
+# # df = df[df['predicted_emotion'] != 'neutral']
 # create_presidents_vectors(df)
-# Apply function to each speech
+# # Apply function to each speech
 # df["__temp_topic_scores__"] = df["speech"].apply(lambda x: extract_topic_sentiment_scores(x, TOPICS_FOR_CLASSIFICATION))
 #
 # # For each topic, create a new column and extract score (default to 0)
