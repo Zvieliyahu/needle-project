@@ -246,20 +246,20 @@ def misclassification_loss(df):
 
 # df.to_excel("prediction_result.xlsx", index=False)
 ########################################## final ###################################################
-# if __name__ == '__main__':
-#     st.title("Political Party Predictor")
-#     #
-#     st.write("Enter a political speech or text below to predict whether it aligns more with the **Democratic** or **Republican** party.")
-#
-#     text_input = st.text_area("Input speech text here:", height=200)
-#
-#     if st.button("Predict"):
-#         if text_input.strip():
-#             with st.spinner("Analyzing..."):
-#                 party, top_features = predict_party(text_input)
-#             st.success(f"Predicted Party: **{party}**")
-#             st.markdown("#### Top 5 Most Similar Features:")
-#             for feature in top_features:
-#                 st.write(f"• {feature}")
-#         else:
-#             st.warning("Please enter some text to analyze.")
+if __name__ == '__main__':
+    st.title("Political Party Predictor")
+    #
+    st.write("Enter a political speech or text below to predict whether it aligns more with the **Democratic** or **Republican** party.")
+
+    text_input = st.text_area("Input speech text here:", height=200)
+
+    if st.button("Predict"):
+        if text_input.strip():
+            with st.spinner("Analyzing..."):
+                party, top_features = predict_party(text_input)
+            st.success(f"Predicted Party: **{party}**")
+            st.markdown("Top 5 Most Similar Features:")
+            for feature in top_features:
+                st.write(f"• {feature}")
+        else:
+            st.warning("Please enter some text to analyze.")

@@ -98,11 +98,13 @@ class PresidentAnalyzer:
 
     def create_database_pca_president(self):
         """
-        Creates the database needed for pca of presidents (only top 10 most active presidents).
+        Creates the database needed for pca of presidents (only top 10 most active presidents,
+        only democratic and republican).
         :return:
         """
-        df = pd.read_excel(self.speeches_df_)
-        president_counts = df['President'].value_counts()
+        df = self.speeches_df_
+        df_filtered_parties = df[df['Party'].isin(['Democratic', 'Republican'])]
+        president_counts = df_filtered_parties['President'].value_counts()
         top_10_presidents = president_counts.head(10).index
         df = df[df['President'].isin(top_10_presidents)]
         create_presidents_vectors(df)
