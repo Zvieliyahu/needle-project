@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from PartyPredictor import *
+from party_predictor import *
 from analyze_prediction_results_new import evaluate_process_results
 ##############
 ## GLOBALS: ##

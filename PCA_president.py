@@ -82,7 +82,7 @@ def create_presidents_vectors(df):
 # # Display the plot in Streamlit
 # st.plotly_chart(fig, use_container_width=True)
 ###################################################################################################################
-# Only democratic and republican 3D
+# # Only democratic and republican 3D
 # st.set_page_config(layout="wide")
 # st.title("3D Visualization of U.S. Presidents Based on Topics & Emotions")
 #
@@ -142,7 +142,7 @@ def create_presidents_vectors(df):
 # ****************************************** final ***********************************
 if __name__ == '__main__':
     st.set_page_config(layout="wide")
-    st.title("1D Visualization of U.S. Presidents (democratic and republican) Based on Topics, Emotions & Sentiments")
+    st.title("1D Visualization of U.S. Presidents (Democratic and Republican) Based on Topics, Emotions & Sentiments")
 
     # Load data
     df = pd.read_csv("mean_presidents_vectors.csv")
@@ -217,12 +217,80 @@ if __name__ == '__main__':
 
     # Display
     st.plotly_chart(fig, use_container_width=True)
-
+# st.set_page_config(layout="wide")
+# st.title("3D Visualization of U.S. Presidents Based on Topics & Emotions")
+# #
+# # # Sample data — replace with your actual CSV or source
+# #
+# # #df = pd.DataFrame(data)
+# df = pd.read_csv("mean_presidents_vectors.csv")
+#
+# # Extract features: exclude 'President' and 'Party'
+# features = df.drop(columns=['President', 'Party'])
+# presidents = df['President']
+# parties = df['Party']
+#
+# # Standardize the feature values
+# scaler = StandardScaler()
+# X_scaled = scaler.fit_transform(features)
+#
+# # Apply PCA to reduce to 3D
+# pca = PCA(n_components=3)
+# pca_result = pca.fit_transform(X_scaled)
+#
+# # Create DataFrame for visualization
+# df_pca = pd.DataFrame(data=pca_result, columns=['PC1', 'PC2', 'PC3'])
+# df_pca['President'] = presidents
+# df_pca['Party'] = parties
+# party_colors = {
+#     'Democratic': 'blue',
+#     'Republican': 'red',
+#     'Democratic-Republican' : 'green',
+#     'National Union': 'orange',   # example for a third party
+#     'Whig': 'grey',             # optional
+#     'Unaffiliated' : 'teal',
+#     'Federalist': 'pink'        # optional
+# }
+#
+# # Create interactive 3D scatter plot
+# fig = px.scatter_3d(
+#     df_pca,
+#     x='PC1',
+#     y='PC2',
+#     z='PC3',
+#     color='Party',
+#     color_discrete_map=party_colors,  # ✅ force consistent colors
+#     text='President',
+#     title='3D PCA of Presidents: Topics and Emotions by Party',
+#     height=700
+# )
+#
+# fig.update_traces(marker=dict(size=6), selector=dict(mode='markers'))
+# fig.update_layout(margin=dict(l=0, r=0, b=0, t=40))
+#
+# # Display the plot in Streamlit
+# st.plotly_chart(fig, use_container_width=True)
 
 ########################################################################################################################
 # *************************************************** final ************************************
-# Preparation
-# df = pd.read_excel('final_data_predictions.xlsx')
+# ## Preparation
+# df = pd.read_excel('presidential_speeches_processed.xlsx')
+# df_filtered_parties = df[df['Party'].isin(['Democratic', 'Republican'])]
+#
+# # Step 2: Count number of rows per president
+# president_counts = df_filtered_parties['President'].value_counts()
+#
+# # Step 3: Get top 10 presidents by row count
+# top_10_presidents = president_counts.head(10).index
+#
+# # Step 4: Filter the DataFrame to keep only those presidents
+# df = df_filtered_parties[df_filtered_parties['President'].isin(top_10_presidents)]
+# # df = df[df['topics'] != 'None']
+# # df = df[df['predicted_emotion'] != 'neutral']
+# create_presidents_vectors(df)
+
+#######################################################
+# df = pd.read_excel('presidential_speeches_processed.xlsx')
 # df_filtered_parties = df[df['Party'].isin(['Democratic', 'Republican'])]
 #
 # # Step 2: Count number of rows per president
