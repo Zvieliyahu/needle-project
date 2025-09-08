@@ -17,7 +17,7 @@ def create_presidents_vectors(df):
     df_filtered = add_label_columns(df_filtered)
     president_mean_vectors = df_filtered.groupby('President')[FEATURE_COLUMNS_3D].mean().reset_index()
     # Extract the Party for each President (assumes each President has one unique Party)
-    president_parties = df_filtered[['President', 'Party']].drop_duplicates(subset='President')
+    president_parties = df_filtered[['President', 'Party', 'from', 'until']].drop_duplicates(subset='President')
 
     # Merge Party info back into the mean vectors
     president_mean_vectors = president_mean_vectors.merge(president_parties, on='President', how='left')
@@ -186,6 +186,8 @@ if __name__ == '__main__':
         'Democratic': 'blue',
         'Republican': 'red',
     }
+    df_pca['text_label'] = df_pca['President'].str.replace(r'(\.)', r'\1<br>', regex=True) + '<br>' + df_pca[
+        'from'].astype(str) + '-' + df_pca['until'].astype(str)
 
     # Create plot
     fig = go.Figure()
@@ -200,9 +202,9 @@ if __name__ == '__main__':
             mode='markers+text',
             name=party,
             marker=dict(size=10, color=party_colors[party]),
-            text=df_party['President'],
+            text=df_party['text_label'],
             textposition=[text_positions[i] for i in df_party.index],
-            textfont=dict(size=12),
+            textfont=dict(size=16),
         ))
 
     # Layout cleanup
@@ -314,3 +316,9 @@ if __name__ == '__main__':
 #
 # # Optional: remove temporary column
 # df.drop(columns=["__temp_topic_scores__"], inplace=True)
+# df = pd.read_excel("presidential_speeches_processed.xlsx")
+# df_filtered_parties = df[df['Party'].isin(['Democratic', 'Republican'])]
+# president_counts = df_filtered_parties['President'].value_counts()
+# top_10_presidents = president_counts.head(10).index
+# df = df[df['President'].isin(top_10_presidents)]
+# create_presidents_vectors(df)
