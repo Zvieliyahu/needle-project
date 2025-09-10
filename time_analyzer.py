@@ -20,11 +20,10 @@ class TimeAnalyzer:
         :param file_path: a file path to the original data frame
         :param classify_speeches: boolean to choose if to classify speeches for the first time
         """
-        self.file_path_ = file_path
-        self.topic_classifier_ = TopicClassifier(file_path, MIN_APPEARANCES)
         self.speeches_df_ = pd.read_excel(file_path)
         if classify_speeches:
-            self.topic_classifier_.classify_speeches_by_subject()
+            topic_classifier_ = TopicClassifier(file_path, MIN_APPEARANCES)
+            topic_classifier_.classify_speeches_by_subject()
 
     @staticmethod
     def plot_speeches_per_decade_by_topic():
@@ -102,9 +101,10 @@ class TimeAnalyzer:
         print(contingency)
         print("Chi2:", chi2, "p-value:", p)
 
-        emotion_dist = pd.crosstab(df['period'], df['predicted_emotion'], normalize='index')
-        dist = cosine(emotion_dist.loc[title_1], emotion_dist.loc[title_2])
-        print("Cosine distance in emotion space:", dist)
+        emotion_similarity = pd.crosstab(df['period'], df['predicted_emotion'], normalize='index')
+        sim = cosine_similarity([emotion_similarity.loc[title_1]], [emotion_similarity.loc[title_2]]).item()
+
+        print("Cosine similarity in emotion space:", sim)
 
         # Create TF-IDF matrix
         df = df.reset_index(drop=True)
@@ -287,12 +287,20 @@ class TimeAnalyzer:
         sim_df = pd.DataFrame(list(similarities.items()), columns=['decade', 'similarity']).sort_values('decade')
 
         # Plot
-        plt.figure(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(10, 6))
+        fig.suptitle("Textual similarity of presidential speeches to 2000–2020 reference")
+
+        ax.text(
+            0.01, 1.02,
+            LANGUAGE_CHANGE_CAPTION,
+            transform=ax.transAxes,
+            fontsize=10, color='gray', ha='left', va='bottom'
+        )
+
         plt.plot(sim_df['decade'], sim_df['similarity'])
         plt.axhline(1.0, color='gray', linestyle='--', label="Perfect similarity")
-        plt.title("Textual similarity of presidential speeches to 2000–2020 reference")
-        plt.xlabel("Decade")
-        plt.ylabel("Cosine similarity")
+        ax.set_xlabel("Decade")
+        ax.set_ylabel("Cosine similarity")
         plt.xticks(sim_df['decade'], rotation=45)
         plt.grid(True)
         plt.legend()
@@ -326,17 +334,18 @@ class TimeAnalyzer:
         self.war_analysis()
         self.plot_black_rights_word_cloud()
         self.plot_immigration_word_cloud()
+        self.similarity_by_decade()
         self.print_stats()
 
 
-# if __name__ == '__main__':
-#     time_analyzer = TimeAnalyzer(classify_speeches=False)
+if __name__ == '__main__':
+    time_analyzer = TimeAnalyzer(classify_speeches=False)
+    # time_analyzer.time_analysis()
 #     time_analyzer.compare_wars()
     # time_analyzer.get_emotion_stats_black_rights()
     # time_analyzer.print_stats()
     # time_analyzer.plot_war_and_peace_terminology_use()
     # time_analyzer.plot_immigration_word_cloud()
-    # time_analyzer.time_analysis()
     # time_analyzer.war_analysis()
     # time_analyzer.plot_black_rights_word_cloud()
-    # time_analyzer.similarity_by_decade()
+    time_analyzer.similarity_by_decade()

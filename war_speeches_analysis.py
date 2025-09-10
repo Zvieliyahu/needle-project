@@ -99,7 +99,7 @@ def plot_use_of_keyword_over_periods(df: pd.DataFrame,
     plt.suptitle(plot_title, fontsize=15)
     ax.text(
         0.01, 1.02,
-        SUBTITLE_WAR,
+        WARS_COMPARISON_CAPTION,
         transform=ax.transAxes,
         fontsize=12, color="gray", ha="left", va="bottom"
     )
@@ -157,7 +157,7 @@ def plot_keyword_trends_per_year(df: pd.DataFrame,
     :param df: DataFrame containing speeches and dates
     :param start_year: First year to include
     :param end_year: Last year to include
-    :param war_keywords: List of keywords for 'war moral'
+    :param war_keywords: List of keywords for 'fighting moral'
     :param peace_keywords: List of keywords for 'peace/end war'
     :param war_periods: List of tuples (war_name, start_year, end_year)
     :param date_column: Name of date column
@@ -206,8 +206,8 @@ def plot_keyword_trends_per_year(df: pd.DataFrame,
 
     # Plot lines
     fig, ax = plt.subplots(figsize=(12,6))
-    line_war, = plt.plot(grouped['year'], grouped['war_avg'], label='War Moral', color='orange')
-    line_peace, = plt.plot(grouped['year'], grouped['peace_avg'], label='Peace / End War', color='blue')
+    line_war, = plt.plot(grouped['year'], grouped['war_avg'], label='Fighting Moral', color='orange')
+    line_peace, = plt.plot(grouped['year'], grouped['peace_avg'], label='Peace Terminology', color='blue')
 
     # Add vertical lines for war periods
     for war_name, start, end in war_periods:
@@ -219,14 +219,11 @@ def plot_keyword_trends_per_year(df: pd.DataFrame,
 
     plt.legend(handles=[line_war, line_peace])
 
-    fig.suptitle('Use of War Moral vs Peace Keywords per Year')
+    fig.suptitle('Comparison of Fighting Moral and Peace Terminology in War-Related Presidential Speeches')
 
     ax.text(
         0.01, 1.02,
-        "This plot shows the use of war-related terminology and peace-related terminology.\n"
-        "It counts the use of words per speech.\n"
-        "This plot uses a data set that was first processed and categorized by using termed rules to find   "
-        "war related speeches.",
+        WAR_AND_PEACE_CAPTION,
         transform=ax.transAxes,
         fontsize=10, color='gray', ha='left', va='bottom'
     )

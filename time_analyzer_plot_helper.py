@@ -10,8 +10,12 @@ import numpy as np
 from PIL import Image
 
 # GLOBALS #
-TOPIC_PLOT_CAPTION = ("This plot shows the number of speeches of each topic by decade.\n"
-                      "Each topic was being processed from the main data set and was categorized using termed rules.")
+TOPIC_PLOT_CAPTION = ("Number of presidential speeches referencing selected topics by decade (1790–2020).\n"
+                      "Trends highlight shifts in public interest, with sharp increases often corresponding to major "
+                      "events in American history.")
+LANGUAGE_CHANGE_CAPTION = ("Cosine similarity of presidential speeches over time.\n"
+                           "The plot illustrates the gradual shift in language, with a clear upward trend indicating "
+                           "a smooth transition.")
 
 # Load stop words (English)
 stop_words = set(stopwords.words('english')) | set(UNRELATED_TOPIC_WORDS)
@@ -29,7 +33,7 @@ def plot_tfidf_word_cloud(df: pd.DataFrame,
                           topic='',
                           start_year=None,
                           end_year=None,
-                          output_path=None,):
+                          output_path=None, ):
     """
     Creating a word cloud for a data frame using TF-IDF.
     :param topic:
@@ -113,7 +117,7 @@ def add_annotations(ax, pivot):
         ax.annotate(
             "Civil Rights Movement",
             xy=(1960, pivot.loc[1960, "Black Rights"]),
-            xytext=(1950, pivot.loc[1960, "Black Rights"]+5),
+            xytext=(1950, pivot.loc[1960, "Black Rights"] + 5),
             arrowprops=dict(facecolor='black', arrowstyle="->"),
             fontsize=9, ha="center"
         )
@@ -121,7 +125,7 @@ def add_annotations(ax, pivot):
         ax.annotate(
             "Abolition of Slavery",
             xy=(1860, pivot.loc[1860, "Black Rights"]),
-            xytext=(1850, pivot.loc[1860, "Black Rights"]+3),
+            xytext=(1850, pivot.loc[1860, "Black Rights"] + 3),
             arrowprops=dict(facecolor='black', arrowstyle="->"),
             fontsize=9, ha="center"
         )
@@ -129,7 +133,7 @@ def add_annotations(ax, pivot):
         ax.annotate(
             "Burlingame Treaty\n&\nChinese Exclusion Act",
             xy=(1880, pivot.loc[1880, "Immigration"]),
-            xytext=(1880, pivot.loc[1880, "Immigration"]+3),
+            xytext=(1880, pivot.loc[1880, "Immigration"] + 3),
             arrowprops=dict(facecolor='black', arrowstyle="->"),
             fontsize=9, ha="center"
         )
@@ -137,7 +141,7 @@ def add_annotations(ax, pivot):
         ax.annotate(
             "Contemporary\nImmigration Debate",
             xy=(2010, pivot.loc[2010, "Immigration"]),
-            xytext=(1990, pivot.loc[2010, "Immigration"]-3),
+            xytext=(1990, pivot.loc[2010, "Immigration"] - 3),
             arrowprops=dict(facecolor='black', arrowstyle="->"),
             fontsize=9, ha="center"
         )
@@ -154,11 +158,10 @@ def plot_speeches_per_decade_by_topic(topic_dfs: dict):
     all_counts = []
 
     for topic, df in topic_dfs.items():
-        # Ensure 'date' column is datetime
         df['date'] = pd.to_datetime(df['date'], errors='coerce')
         df = df.dropna(subset=['date'])
 
-        # Create 'decade' column (e.g., 1860, 1930)
+        # Create decade column
         df['decade'] = (df['date'].dt.year // 10) * 10
 
         # Count speeches per decade for this topic
@@ -190,7 +193,7 @@ def plot_speeches_per_decade_by_topic(topic_dfs: dict):
 
     add_annotations(ax, pivot)
 
-    plt.tight_layout(rect=[0,0,1,0.96])
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.savefig("topics_of_presidential_speeches_by_decade.png", bbox_inches="tight")
 
 
@@ -242,4 +245,3 @@ def combine_images_side_by_side(paths, output_path=None, subtitle=""):
         new_img.show()
 
     return new_img
-

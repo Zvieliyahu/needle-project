@@ -93,3 +93,74 @@ def extract_sentiments(speech: str) -> float:
 # misclassification_loss(df_new)
 #
 # df_new.to_excel("log_prediction_result.xlsx", index=False)
+
+def clean_text(text: str):
+    """
+    Cleaning text by removing stopwords and non alphabet characters.
+    :param text: a speech
+    :return:
+    """
+    doc = nlp(text.lower())
+
+    # Filter: remove stopwords, punctuation, numbers, and non-alphabetic tokens
+    tokens = [
+        token.lemma_ for token in doc
+        if token.is_alpha and token.lemma_.lower() not in stop_words
+    ]
+
+    return ' '.join(tokens)
+
+
+
+def plot_emotions_and_labels(df, start_year=None, end_year=None):
+    """
+    Plots a grouped bar chart of predicted emotions and labels by topic over a specified period.
+
+    Parameters:
+        df (DataFrame): Must contain 'date', 'topic', 'predicted_emotion', and 'label' columns.
+        start_year (int, optional): Start of the period (inclusive).
+        end_year (int, optional): End of the period (inclusive).
+    """
+    df = df.copy()
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    df = df.dropna(subset=['date'])
+
+    # Filter by year range
+    if start_year is not None:
+        df = df[df['date'].dt.year >= start_year]
+    if end_year is not None:
+        df = df[df['date'].dt.year <= end_year]
+
+    # Group and count emotions
+    emotions_grouped = df.groupby(['topic', 'predicted_emotion']).size().reset_index(name='count')
+    emotions_pivot = emotions_grouped.pivot(index='topic', columns='predicted_emotion', values='count').fillna(0)
+
+    # Group and count labels
+    labels_grouped = df.groupby(['topic', 'label']).size().reset_index(name='count')
+    labels_pivot = labels_grouped.pivot(index='topic', columns='label', values='count').fillna(0)
+
+    topics = emotions_pivot.index
+    emotions = emotions_pivot.columns
+    labels = labels_pivot.columns
+
+    width = 0.35  # width of each bar
+    x = np.arange(len(topics))  # the label locations
+
+    fig, ax = plt.subplots(figsize=(14,6))
+
+    # Plot emotions bars
+    for i, emotion in enumerate(emotions):
+        ax.bar(x - width/2 + (i/len(emotions))*width, emotions_pivot[emotion], width/len(emotions), label=f"Emotion: {emotion}")
+
+    # Plot labels bars
+    for i, lbl in enumerate(labels):
+        ax.bar(x + width/2 + (i/len(labels))*width, labels_pivot[lbl], width/len(labels), label=f"Label: {lbl}", hatch='//')
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(topics, rotation=45, ha='right')
+    ax.set_xlabel("Topic")
+    ax.set_ylabel("Number of Speeches")
+    ax.set_title(f"Speeches by Emotion and Label per Topic ({start_year}-{end_year})")
+    ax.legend(bbox_to_anchor=(1.05,1), loc='upper left')
+    plt.tight_layout()
+    plt.show()

@@ -33,7 +33,6 @@ Y_AXIS_LIMIT_ECONOMY = 800
 
 TOPICS = ["PEACE", "VICTORY", "ECONOMY"]
 
-
 """
                   #############################
                   ## KEYWORD LISTS BY TOPICS ##
@@ -109,12 +108,13 @@ WAR_PERIODS = [
     ("Civil War", 1859, 1867),
     ("First World War", 1915, 1919),
     ("Second World War", 1937, 1947),
-    # ("Korean War", 1949, 1955),
     ("Vietnam War", 1961, 1977),
-    # ("Gulf War", 1988, 1993),
-    # ("Afghanistan War", 2001, 2021),
     ("Iraq War\n&\nPost 9/11", 2001, 2013)
 ]
 
-SUBTITLE_WAR = ("This plot shows the count of words in a certain period.\n"
-                "The color of the column shows the normalized use per speech - the darker the more frequent it is used.")
+WARS_COMPARISON_CAPTION = ("Word count and frequency of topic-related terms in presidential speeches.\n"
+                           "The plot highlights differences in terminology between World War II and the Vietnam War.")
+WAR_AND_PEACE_CAPTION = ("Average use of fighting moral and peace terminology in presidential speeches.\n"
+                         "The trends illustrate shifts related to war and peace: during wartime, fighting terms "
+                         "dominate,"
+                         "\nwhile in peacetime, peace terminology is more prevalent.")
