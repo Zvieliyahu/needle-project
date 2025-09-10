@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from party_predictor import *
-from analyze_prediction_results_new import evaluate_process_results
+from analyze_prediction_results import evaluate_process_results
+
 ##############
 ## GLOBALS: ##
 ##############
@@ -9,6 +10,8 @@ PROCESSED_FILE_PATH = "presidential_speeches_processed.xlsx"
 PARTY_PREDICTION_RESULT_FILE_PATH = "predictions_result.xlsx"
 BIDEN_FILE_PATH = "Data\cleantext_JoeBiden.tsv"
 TRUMP_FILE_PATH = "Data\cleantext_DonaldTrump.tsv"
+
+
 class PartyAnalyzer:
     """
     Class for analyzing U.S. presidential speeches based on the party.
@@ -16,16 +19,15 @@ class PartyAnalyzer:
 
     def __init__(self, file_path: str = FILE_PATH, classify_speeches: bool = True):
         """
-        Initialize a time analyzer instance
-        :param file_path: a file path to the original data frame
-        :param classify_speeches: boolean to choose if to classify speeches for the first time
+        Initialize a party analyzer instance.
+        :param file_path: A file path to the original data frame.
+        :param classify_speeches: Boolean to choose if to classify speeches for the first time.
         """
         self.file_path_ = file_path
         if classify_speeches:
             process_data(self.file_path_, PROCESSED_FILE_PATH)
             evaluate_process_results(PROCESSED_FILE_PATH)
         self.speeches_df_ = pd.read_excel(PROCESSED_FILE_PATH)
-
 
     def plot_speeches_per_party_by_topic(self):
         """
@@ -95,52 +97,38 @@ class PartyAnalyzer:
         # Cleaning Biden data and preparing for test
         df_biden = pd.read_csv(BIDEN_FILE_PATH, sep="\t")
         biden_filtered_df = df_biden[['CleanText', 'Date']]
-        biden_filtered_df = biden_filtered_df[biden_filtered_df['CleanText'].notna() & (biden_filtered_df['CleanText'].str.strip() != '')]
+        biden_filtered_df = biden_filtered_df[biden_filtered_df['CleanText'].notna() &
+                                              (biden_filtered_df['CleanText'].str.strip() != '')]
         biden_filtered_df['Party'] = 'Democratic'
 
         # Cleaning Trump data and preparing for test
         df_trump = pd.read_csv(TRUMP_FILE_PATH, sep="\t")
         trump_filtered_df = df_trump[df_trump['SpeechID'].str.startswith('CSPAN', na=False)]
         trump_filtered_df = trump_filtered_df[['CleanText', 'Date']]
-        trump_filtered_df = trump_filtered_df[trump_filtered_df['CleanText'].notna() & (trump_filtered_df['CleanText'].str.strip() != '')]
+        trump_filtered_df = trump_filtered_df[trump_filtered_df['CleanText'].notna() &
+                                              (trump_filtered_df['CleanText'].str.strip() != '')]
         trump_filtered_df['Party'] = 'Republican'
-
-        # Predicting and vectorising Biden's speeches
-        # expanded_features_df_biden = biden_filtered_df['CleanText'].apply(
-        #     lambda text: predict_party(text)
-        # )
-        # expanded_features_df_biden = expanded_features_df_biden.apply(pd.Series)
-        # expanded_features_df_biden.columns = FEATURE_COLUMNS
-        # biden_filtered_df = pd.concat([biden_filtered_df, expanded_features_df_biden], axis=1)
         biden_filtered_df['predicted_party'] = biden_filtered_df['CleanText'].apply(lambda x: predict_party(x)[0])
 
         # Only Biden's results (unseen president)
         print("\n######################################################################\n")
         print("Biden's prediction results:")
-        # biden_filtered_df['predicted_party'] = biden_filtered_df.apply(test_loss, axis=1)
         misclassification_loss(biden_filtered_df)
         print("\n")
 
-        # Predicting and vectorising Trump's speeches
-        # expanded_features_df_trump = trump_filtered_df['CleanText'].apply(
-        #     lambda text: predict_party(text)
-        # )
-        # expanded_features_df_trump = expanded_features_df_trump.apply(pd.Series)
-        # expanded_features_df_trump.columns = FEATURE_COLUMNS
-        # trump_filtered_df = pd.concat([trump_filtered_df, expanded_features_df_trump], axis=1)
-
         # Combine datasets
         trump_filtered_df['predicted_party'] = trump_filtered_df['CleanText'].apply(lambda x: predict_party(x)[0])
-
         filtered_df = pd.concat([biden_filtered_df, trump_filtered_df], ignore_index=True)
-        # filtered_df['predicted_party'] = filtered_df.apply(test_loss, axis=1)
+
+        # Full results
         print("Total prediction results:")
         misclassification_loss(filtered_df)
         print("\n######################################################################\n")
         filtered_df.to_excel(PARTY_PREDICTION_RESULT_FILE_PATH)
+
     def party_analysis(self):
         """
-        Running time analysis of presidential speeches over time.
+        Running party analysis of presidential speeches based on the party.
         :return:
         """
         self.plot_speeches_per_party_by_topic()

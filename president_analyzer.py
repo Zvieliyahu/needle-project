@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 from process_data import *
-from analyze_prediction_results_new import evaluate_process_results
+from analyze_prediction_results import evaluate_process_results
 from PCA_president import create_presidents_vectors
 
 ##############
@@ -10,6 +9,7 @@ from PCA_president import create_presidents_vectors
 FILE_PATH = "Data/presidential_speeches.xlsx"
 PROCESSED_FILE_PATH = "presidential_speeches_processed.xlsx"
 
+
 class PresidentAnalyzer:
     """
     Class for analyzing U.S. presidential speeches based on the president.
@@ -17,16 +17,15 @@ class PresidentAnalyzer:
 
     def __init__(self, file_path: str = FILE_PATH, classify_speeches: bool = True):
         """
-        Initialize a time analyzer instance
-        :param file_path: a file path to the original data frame
-        :param classify_speeches: boolean to choose if to classify speeches for the first time
+        Initialize a president analyzer instance.
+        :param file_path: A file path to the original data frame.
+        :param classify_speeches: Boolean to choose if to classify speeches for the first time.
         """
         self.file_path_ = file_path
         if classify_speeches:
             process_data(self.file_path_, PROCESSED_FILE_PATH)
             evaluate_process_results(PROCESSED_FILE_PATH)
         self.speeches_df_ = pd.read_excel(PROCESSED_FILE_PATH)
-
 
     def plot_speeches_per_president_by_topic(self):
         """
