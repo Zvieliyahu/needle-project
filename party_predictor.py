@@ -1,6 +1,4 @@
 from predictor_helper import *
-# TODO: check changes
-# from check_common_words import get_top_words
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
 import streamlit as st
@@ -68,8 +66,6 @@ def predict_party(text: str):
     # apply preprocessing on input
     df = pd.DataFrame({'speech': [text]})
     df = classify_emotion(df)
-    # TODO: Change
-    # df['topics'] = df['speech'].apply(get_top_words)
     df['topics'] = df['speech'].apply(classify_topic)
     df_sent = df['speech'].apply(assign_positivity_label)
     df_sent = df_sent.apply(pd.Series)

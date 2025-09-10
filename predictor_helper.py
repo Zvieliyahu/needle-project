@@ -1,6 +1,4 @@
 from process_data import *
-# TODO: Check
-# from filter_topic import assign_positivity_label
 from tqdm import tqdm
 WINDOW_SIZE = 15
 MAX_SAMPLES_PER_TOPIC = 10
