@@ -9,9 +9,9 @@ class TopicClassifier:
 
     def __init__(self, file_path: str = FILE_PATH, num_appearances: int = MIN_APPEARANCES):
         """
-        Initialize a topic classifier instance
-        :param file_path: a file path to the original data set
-        :param num_appearances: a parameter to tune accuracy (the higher, the more accuracy)
+        Initialize a topic classifier instance.
+        :param file_path: A file path to the original data set.
+        :param num_appearances: A parameter to tune accuracy (the higher, the more accuracy).
         """
         self.file_path_ = file_path
         self.num_appearances_ = num_appearances
@@ -45,7 +45,7 @@ class TopicClassifier:
         Filtering speeches that talks about women's rights and output a new dataset with speeches about that topic
         with speeches cutted to the relevant part, with emotions and positivity label assigned to that specific
         part of the speech.
-        :param directory: a directory to save the Excel files
+        :param directory: A directory to save the Excel files.
         :return:
         """
         if not os.path.exists(DIRECTORY_WOMEN_RIGHTS):

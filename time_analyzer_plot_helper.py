@@ -201,10 +201,10 @@ def combine_images_side_by_side(paths, output_path=None, subtitle=""):
     """
     Combine multiple images side by side.
 
-    :param subtitle: subtitle text to add below the title
-    :param paths: list of file paths to images
-    :param output_path: optional path to save the combined image
-    :return: combined PIL.Image object
+    :param subtitle: Subtitle text to add below the title.
+    :param paths: List of file paths to images.
+    :param output_path: Optional path to save the combined image.
+    :return: combined PIL.Image object.
     """
     if not paths:
         raise ValueError("No image paths provided.")

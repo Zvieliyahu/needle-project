@@ -18,16 +18,16 @@ def plot_use_of_keyword_over_periods(df: pd.DataFrame,
     """
     Create a bar plot - each bar represents a time period and measures the number of keywords appear in the speeches
     of that time.
-    :param df: a dataframe with a date column and a speech column
-    :param keywords: a set of keywords to count their appearances
-    :param periods: a dictionary of the name of the period and a range of year, e.g. {"ww2": (1939, 1945)}
-    :param normalize_value: a parameter to normalize the color of the bar
-    (best set as the highest value of keywords/speech)
-    :param y_axis_limit: a limit to adjust the bars heights
-    :param plot_title: title of the plot
-    :param date_column: name of date column
-    :param text_column: name of text column
-    :param output_path: to save the fig
+    :param df: A dataframe with a date column and a speech column.
+    :param keywords: A set of keywords to count their appearances.
+    :param periods: A dictionary of the name of the period and a range of year, e.g. {"ww2": (1939, 1945)}.
+    :param normalize_value: A parameter to normalize the color of the bar
+    (best set as the highest value of keywords/speech).
+    :param y_axis_limit: A limit to adjust the bars heights.
+    :param plot_title: Title of the plot.
+    :param date_column: Name of date column.
+    :param text_column: Name of text column.
+    :param output_path: To save the fig.
     :return:
     """
     # Converting date columns to date format and dropping columns
@@ -38,9 +38,9 @@ def plot_use_of_keyword_over_periods(df: pd.DataFrame,
 
     def count_keywords_in_text(text):
         """
-        Counting keywords in speech
-        :param text: speech
-        :return: keyword count
+        Counting keywords in speech.
+        :param text: Speech.
+        :return: Keyword count.
         """
         words = re.findall(r'\b\w+\b', str(text).lower())
         return sum(1 for word in words if word in keywords_set)
@@ -118,10 +118,10 @@ def add_war_labels(ax, df, title, start_year, end_year):
 
     Parameters:
         ax (matplotlib.axes.Axes): The axes to annotate.
-        df (DataFrame): grouped dataframe with 'year', 'war_avg', 'peace_avg'.
-        title (str): name of the war
-        start_year (int): start year of the war
-        end_year (int): end year of the war
+        df (DataFrame): Grouped dataframe with 'year', 'war_avg', 'peace_avg'.
+        title (str): Name of the war.
+        start_year (int): Start year of the war.
+        end_year (int): End year of the war.
     """
     mid_year = (start_year + end_year) / 2
 
@@ -154,17 +154,17 @@ def plot_keyword_trends_per_year(df: pd.DataFrame,
     """
     Plot per-year usage of two keyword sets in speeches, with markers on war start/end years.
 
-    :param df: DataFrame containing speeches and dates
-    :param start_year: First year to include
-    :param end_year: Last year to include
-    :param war_keywords: List of keywords for 'fighting moral'
-    :param peace_keywords: List of keywords for 'peace/end war'
-    :param war_periods: List of tuples (war_name, start_year, end_year)
-    :param date_column: Name of date column
-    :param text_column: Name of speech text column
-    :param normalize_per_speech: If True, average keyword count per speech; if False, total count
-    :param rolling_window: Number of years for rolling average smoothing (set to 1 or 0 for no smoothing)
-    :param output_path: Path to save the figure (optional)
+    :param df: DataFrame containing speeches and dates.
+    :param start_year: First year to include.
+    :param end_year: Last year to include.
+    :param war_keywords: List of keywords for 'fighting moral'.
+    :param peace_keywords: List of keywords for 'peace/end war'.
+    :param war_periods: List of tuples (war_name, start_year, end_year).
+    :param date_column: Name of date column.
+    :param text_column: Name of speech text column.
+    :param normalize_per_speech: If True, average keyword count per speech; if False, total count.
+    :param rolling_window: Number of years for rolling average smoothing (set to 1 or 0 for no smoothing).
+    :param output_path: Path to save the figure (optional).
     """
     # Ensure date is datetime
     df = df.dropna(subset=[date_column, text_column]).copy()
@@ -205,7 +205,7 @@ def plot_keyword_trends_per_year(df: pd.DataFrame,
         grouped['peace_avg'] = grouped['peace_avg'].rolling(window=rolling_window, center=True, min_periods=1).mean()
 
     # Plot lines
-    fig, ax = plt.subplots(figsize=(12,6))
+    fig, ax = plt.subplots(figsize=(12, 6))
     line_war, = plt.plot(grouped['year'], grouped['war_avg'], label='Fighting Moral', color='orange')
     line_peace, = plt.plot(grouped['year'], grouped['peace_avg'], label='Peace Terminology', color='blue')
 
@@ -231,7 +231,7 @@ def plot_keyword_trends_per_year(df: pd.DataFrame,
     ax.set_xlabel('Year')
     ax.set_ylabel('Average Keywords per Speech' if normalize_per_speech else 'Total Keywords')
     ax.grid(True)
-    plt.tight_layout(rect=[0,0,1,0.97])
+    plt.tight_layout(rect=[0, 0, 1, 0.97])
 
     if output_path:
         plt.savefig(output_path, bbox_inches='tight')

@@ -1,10 +1,7 @@
-import matplotlib.pyplot as plt
-import pandas as pd
 from topic_classifier import *
 from war_speeches_analysis import *
 from time_analyzer_plot_helper import *
 from scipy.stats import chi2_contingency
-from scipy.spatial.distance import cosine
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -16,9 +13,9 @@ class TimeAnalyzer:
 
     def __init__(self, file_path: str = FILE_PATH, classify_speeches: bool = True):
         """
-        Initialize a time analyzer instance
-        :param file_path: a file path to the original data frame
-        :param classify_speeches: boolean to choose if to classify speeches for the first time
+        Initialize a time analyzer instance.
+        :param file_path: A file path to the original data frame.
+        :param classify_speeches: Boolean to choose if to classify speeches for the first time.
         """
         self.speeches_df_ = pd.read_excel(file_path)
         if classify_speeches:
@@ -252,7 +249,7 @@ class TimeAnalyzer:
 
     def similarity_by_decade(self):
         """
-        Plots a cosine similarity per decade with respect to modern speeches (2000 - 2020)
+        Plots a cosine similarity per decade with respect to modern speeches (2000 - 2020).
         :return:
         """
         # Adding decade column
@@ -336,16 +333,3 @@ class TimeAnalyzer:
         self.plot_immigration_word_cloud()
         self.similarity_by_decade()
         self.print_stats()
-
-
-if __name__ == '__main__':
-    time_analyzer = TimeAnalyzer(classify_speeches=False)
-    # time_analyzer.time_analysis()
-#     time_analyzer.compare_wars()
-    # time_analyzer.get_emotion_stats_black_rights()
-    # time_analyzer.print_stats()
-    # time_analyzer.plot_war_and_peace_terminology_use()
-    # time_analyzer.plot_immigration_word_cloud()
-    # time_analyzer.war_analysis()
-    # time_analyzer.plot_black_rights_word_cloud()
-    time_analyzer.similarity_by_decade()
