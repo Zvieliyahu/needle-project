@@ -45,7 +45,6 @@ class TopicClassifier:
         Filtering speeches that talks about women's rights and output a new dataset with speeches about that topic
         with speeches cutted to the relevant part, with emotions and positivity label assigned to that specific
         part of the speech.
-        :param directory: A directory to save the Excel files.
         :return:
         """
         if not os.path.exists(DIRECTORY_WOMEN_RIGHTS):

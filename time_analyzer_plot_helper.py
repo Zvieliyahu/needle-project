@@ -1,3 +1,4 @@
+# IMPORTS:
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -20,7 +21,7 @@ LANGUAGE_CHANGE_CAPTION = ("Cosine similarity of presidential speeches over time
 # Load stop words (English)
 stop_words = set(stopwords.words('english')) | set(UNRELATED_TOPIC_WORDS)
 
-# Load spaCy English model once
+# Load spaCy English model
 nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
 for word in UNRELATED_TOPIC_WORDS:
     nlp.vocab[word].is_stop = True

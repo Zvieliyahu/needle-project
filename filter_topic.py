@@ -199,7 +199,7 @@ def find_speeches_with_keywords(file_path: str, keywords: List[str], important_k
     )
     topic_speeches_df['topic'] = topic
 
-    # Adding sentiment and emotion: #
+    # Adding sentiment and emotion:
     tqdm.pandas()
     sentiment_results = topic_speeches_df['speech'].progress_apply(assign_positivity_label)
     # Convert the series of dicts into a DataFrame with separate columns

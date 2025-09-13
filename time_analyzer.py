@@ -227,8 +227,8 @@ class TimeAnalyzer:
         print(emotion_label_table)
 
         chi2, p, dof, expected = chi2_contingency(emotion_label_table)
-        print("\nChi² test for independence between labels and emotions")
-        print("Chi²:", chi2, "p-value:", p)
+        print("\nChi square test for independence between labels and emotions")
+        print("Chi^2:", chi2, "p-value:", p)
         print("\n######################################################################\n")
 
     def plot_immigration_word_cloud(self):
