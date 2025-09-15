@@ -112,9 +112,7 @@ def misclassification_loss(df):
 
 
 if __name__ == '__main__':
-    """
-    Streamlit application of Party Prediction
-    """
+    # Streamlit application of Party Prediction
     st.title("Political Party Predictor")
     st.write("Enter a political speech or text below to predict whether it aligns more with the"
              " **Democratic** or **Republican** party.")

@@ -48,8 +48,8 @@ def classify_emotion(df: pd.DataFrame) -> pd.DataFrame:
 def assign_positivity_label(speech: str) -> Dict:
     """
     Assign positivity label (positive, negative or neutral) to a given text.
-    :param speech: the text to which to assign the label
-    :return: a dict of label: confidence
+    :param speech: The text to which to assign the label.
+    :return: A dict of label: confidence.
     """
     speech = remove_thanking_phrases(speech)
     words = speech.split()

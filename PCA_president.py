@@ -27,9 +27,7 @@ def create_presidents_vectors(df: pd.DataFrame):
 
 
 if __name__ == '__main__':
-    """
-    Streamlit application of visualization of the top 10 presidents vectors (Democratic and Republican)
-    """
+    # Streamlit application of visualization of the top 10 presidents vectors (Democratic and Republican)
     st.set_page_config(layout="wide")
     st.title("1D Visualization of U.S. Presidents (Democratic and Republican) Based on Topics, Emotions & Sentiments")
 

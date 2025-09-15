@@ -129,6 +129,8 @@ def classify_topic(text, n=30):
 """
 
 CHUNK_SIZE = 200
+NEUTRAL_SENTIMENT_UPPER_BOUND = 0.6
+NEUTRAL_SENTIMENT_LOWER_BOUND = 0.3
 LABEL_MAP = {
     "LABEL_0": "negative",
     "LABEL_1": "neutral",
@@ -165,7 +167,8 @@ def assign_positivity_label(speech: str) -> Dict:
         score = result["score"]
 
         # If not that confident in neutral choosing to assign positive/negative labels
-        if label == "neutral" and score < 0.6 and result_list[0][1]["score"] > 0.3:
+        if (label == "neutral" and score < NEUTRAL_SENTIMENT_UPPER_BOUND and
+                result_list[0][1]["score"] > NEUTRAL_SENTIMENT_LOWER_BOUND):
             label = LABEL_MAP[result_list[0][1]["label"]]
             score = result_list[0][1]["score"]
 
